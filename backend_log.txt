@@ -1,0 +1,81 @@
+INFO:     Will watch for changes in these directories: ['D:\\HAKIMI-ERP\\hakimi-erp\\backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [21820] using StatReload
+INFO:     Started server process [24940]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:58366 - "GET /api/v1/master/materials/sales-organizations?page_size=3 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63250 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50300 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51139 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51140 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:65026 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58284 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54069 - "GET /api/api/v1/master/partners/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54071 - "GET /api/v1/master/materials/?page_size=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54074 - "GET /api/v1/master/materials/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54086 - "GET /api/v1/master/materials/?page_size=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61708 - "GET /api/v1/master/materials/sales-organizations?page_size=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50476 - "GET /api/v1/master/materials/pricing-conditions?page_size=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57883 - "GET /api/v1/sales/quotations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62422 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62628 - "GET /api/api/v1/master/materials/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57800 - "GET /api/api/v1/finance/ar/open?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57801 - "GET /api/api/v1/finance/invoices?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52689 - "GET /api/v1/finance/ar/open HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59420 - "GET /api/v1/finance/ar/closed HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57512 - "GET /api/v1/finance/invoices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63776 - "GET /api/v1/logistics/deliveries HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63367 - "GET /api/v1/sales/quotations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63274 - "GET /api/v1/sales/inquiries HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61860 - "GET /api/v1/master/partners/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58309 - "GET /api/v1/master/materials/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53026 - "GET /api/v1/logistics/deliveries HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57023 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57025 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50111 - "GET /api/v1/logistics/deliveries HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55433 - "POST /api/v1/finance/invoices/from-delivery/DLV0001 HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:49500 - "POST /api/v1/logistics/deliveries/DLV0007/pgi HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60856 - "GET /api/v1/logistics/deliveries HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59650 - "POST /api/v1/finance/invoices/from-delivery/DLV0007 HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:57444 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57445 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62046 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63274 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56596 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56598 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53238 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58028 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57973 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57974 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63744 - "GET /api/api/v1/logistics/deliveries?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62444 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:54225 - "GET /api/v1/finance/invoices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53442 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64928 - "GET /api/api/v1/master/partners/?limit=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50898 - "GET /api/api/v1/sales/orders?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56956 - "GET /api/api/v1/logistics/deliveries?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:56957 - "GET /api/api/v1/finance/ar/open?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57884 - "GET /api/api/v1/master/partners/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59870 - "GET /api/api/v1/sales/orders?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59871 - "GET /api/api/v1/logistics/deliveries?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51026 - "GET /api/api/v1/finance/ar/open?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52556 - "GET /api/v1/finance/invoices HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56561 - "GET /api/api/v1/master/partners/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52188 - "POST /api/api/v1/master/partners/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58363 - "POST /api/api/v1/master/partners/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:63366 - "POST /api/api/v1/master/partners/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:62631 - "POST /api/api/v1/master/partners/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61327 - "GET /api/api/v1/sales/orders?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61328 - "GET /api/api/v1/logistics/deliveries?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61329 - "GET /api/api/v1/finance/ar/open?page_size=1000 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:57789 - "GET /api/v1/sales/orders HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56547 - "GET /api/v1/master/partners/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56548 - "GET /api/v1/master/materials/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57338 - "GET /api/v1/master/materials/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63040 - "GET /api/api/v1/master/partners/ HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:58270 - "GET /api/v1/master/materials/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51235 - "GET /api/v1/master/materials/?page_size=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56752 - "GET /api/v1/master/materials/ HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'app\main.py'. Reloading...
+ 
