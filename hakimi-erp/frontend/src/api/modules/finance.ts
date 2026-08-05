@@ -29,7 +29,14 @@ export interface Invoice {
 
 export interface InvoiceList {
   items: Invoice[]
+  pagination: Pagination
+}
+
+interface Pagination {
+  page: number
+  page_size: number
   total: number
+  total_pages: number
 }
 
 export interface OpenAccountReceivable {
@@ -53,7 +60,7 @@ export interface ClosedAccountReceivable {
 
 export interface ReceivableList {
   items: (OpenAccountReceivable | ClosedAccountReceivable)[]
-  total: number
+  pagination: Pagination
 }
 
 export interface Receipt {

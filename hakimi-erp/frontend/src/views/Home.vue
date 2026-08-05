@@ -114,18 +114,18 @@ import { fetchOrders, fetchDeliveries, fetchOpenAR } from '@/api'
 import { formatCurrency, formatNumber } from '@/utils/format'
 
 interface DashboardData {
-  orders: { total: number; items: any[] }
-  deliveries: { total: number; items: any[] }
-  openAR: { total: number; items: any[] }
+  orders: { pagination: { total: number }; items: any[] }
+  deliveries: { pagination: { total: number }; items: any[] }
+  openAR: { pagination: { total: number }; items: any[] }
 }
 
 const loading = ref(true)
 const error = ref('')
 
 const data = ref<DashboardData>({
-  orders: { total: 0, items: [] },
-  deliveries: { total: 0, items: [] },
-  openAR: { total: 0, items: [] },
+  orders: { pagination: { total: 0 }, items: [] },
+  deliveries: { pagination: { total: 0 }, items: [] },
+  openAR: { pagination: { total: 0 }, items: [] },
 })
 
 const firstDayOfMonth = computed(() => {
@@ -159,7 +159,7 @@ const monthOrderValue = computed(() => {
 const cards = computed(() => [
   {
     title: 'Sales Orders',
-    value: formatNumber(data.value.orders.total, 0),
+    value: formatNumber(data.value.orders.pagination.total, 0),
     change: '+12%',
     changeType: 'up' as const,
     comparison: 'vs. Yesterday',
@@ -168,7 +168,7 @@ const cards = computed(() => [
   },
   {
     title: 'Delivery Orders',
-    value: formatNumber(data.value.deliveries.total, 0),
+    value: formatNumber(data.value.deliveries.pagination.total, 0),
     change: '+8%',
     changeType: 'up' as const,
     comparison: 'vs. Yesterday',

@@ -1,46 +1,86 @@
-# Logs
+# Environment files and credentials
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependency directories and local runtimes
+node_modules/
+.node-runtime/
+.venv/
+venv/
+env/
+ENV/
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+*.egg-info/
+.vite/
+*.tsbuildinfo
+
+# Python bytecode, test, and coverage artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+.nyc_output/
+
+# Logs and runtime output
 *.log
+*.log.*
+*.pid
+*.pid.lock
+*.out
+*.err
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-
-# Diagnostic reports (python-docx, etc)
-docx_extracted.txt
-docx_report1.txt
-docx_report2.txt
 vite_output.txt
+docx_extracted.txt
+docx_report*.txt
+/backend_*.txt
+/openapi.json
 
-# Dependency directories
-node_modules/
-dist/
-dist-ssr/
-*.local
+# Local database files (keep backend/database/*.sql tracked)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
 
-# Editor directories and files
+# Editor and IDE files
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.local
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+# Temporary files
+~$*
+*.tmp
+*.temp
+*.bak
 
-# OS
+# Operating system metadata
 .DS_Store
 Thumbs.db
+Desktop.ini

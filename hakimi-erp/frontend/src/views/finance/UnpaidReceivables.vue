@@ -176,11 +176,11 @@ async function fetchData() {
   error.value = ''
   try {
     const [arRes, invRes] = await Promise.all([
-      fetchOpenAR({ limit: 1000 }),
-      fetchInvoices({ limit: 1000 })
+      fetchOpenAR({ page_size: 100 }),
+      fetchInvoices({ page_size: 100 })
     ])
-    rawOpenAR.value = arRes.data.items || []
-    const invItems = invRes.data.items || []
+    rawOpenAR.value = arRes.items || []
+    const invItems = invRes.items || []
     invoiceMap.value = invItems.reduce((acc: Record<string, Invoice>, inv: Invoice) => {
       if (inv.invoice_id) acc[inv.invoice_id] = inv
       return acc

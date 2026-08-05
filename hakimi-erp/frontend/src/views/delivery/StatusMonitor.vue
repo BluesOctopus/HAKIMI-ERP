@@ -140,11 +140,11 @@ async function fetchData() {
   error.value = ''
   try {
     const [delRes, partRes] = await Promise.all([
-      fetchDeliveries({ limit: 1000 }),
-      fetchPartners({ limit: 1000 })
+      fetchDeliveries({ page_size: 100 }),
+      fetchPartners({ page_size: 100 })
     ])
-    rawDeliveries.value = delRes.data.items || []
-    const partners = partRes.data.items || []
+    rawDeliveries.value = delRes.items || []
+    const partners = partRes.items || []
     partnerMap.value = partners.reduce((acc: Record<string, Partner>, p: Partner) => {
       if (p.bp_id) acc[p.bp_id] = p
       return acc

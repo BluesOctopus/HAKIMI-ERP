@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import List
 from app.api import deps
@@ -12,18 +12,18 @@ router = APIRouter()
 @router.get("/", response_model=ResponseModel[PaginatedData[BusinessPartner]])
 def read_partners(
     db: Session = Depends(get_db),
-    page: int = 1,
-    page_size: int = 20
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100)
 ):
     skip = (page - 1) * page_size
     partners = customer_service.get_partners(db, skip=skip, limit=page_size)
-    # Simple pagination mock for now
-    total = len(partners) 
-    
+    total = customer_service.count_partners(db)
+    total_pages = (total + page_size - 1) // page_size if total else 0
+
     return ResponseModel(
         data=PaginatedData(
             items=partners,
-            pagination=Pagination(page=page, page_size=page_size, total=total, total_pages=1)
+            pagination=Pagination(page=page, page_size=page_size, total=total, total_pages=total_pages)
         )
     )
 

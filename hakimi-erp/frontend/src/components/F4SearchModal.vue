@@ -110,8 +110,8 @@ const typeConfig = computed(() => {
           { key: 'city', label: 'City' }
         ] as F4Column[],
         fetch: async () => {
-          const res = await fetchPartners({ limit: 1000 })
-          return res.data.items || []
+          const res = await fetchPartners({ page_size: 100 })
+          return res.items || []
         }
       }
     case 'material':
@@ -123,8 +123,8 @@ const typeConfig = computed(() => {
           { key: 'base_unit', label: 'UoM' }
         ] as F4Column[],
         fetch: async () => {
-          const res = await fetchMaterials({ limit: 1000 })
-          return res.data.items || []
+          const res = await fetchMaterials({ page_size: 100 })
+          return res.items || []
         }
       }
     case 'relationship':

@@ -265,16 +265,16 @@ watch(() => itemData.material, (id) => {
 
 async function loadMasters() {
   const [bpRes, matRes] = await Promise.all([
-    fetchPartners({ limit: 1000 }),
-    fetchMaterials({ limit: 1000 })
+    fetchPartners({ page_size: 100 }),
+    fetchMaterials({ page_size: 100 })
   ])
-  partners.value = bpRes.data.items || []
-  materials.value = matRes.data.items || []
+  partners.value = bpRes.items || []
+  materials.value = matRes.items || []
 }
 
 async function loadFromInquiry(id: string) {
   const res = await fetchInquiryById(id)
-  const inq: Inquiry = res.data
+  const inq: Inquiry = res
   inquiryId.value = inq.inquiry_id
   customerId.value = inq.customer_id
   isFromInquiry.value = true
@@ -289,7 +289,7 @@ async function loadFromInquiry(id: string) {
 
 async function loadFromQuotation(id: string) {
   const res = await fetchQuotationById(id)
-  const q: Quotation = res.data
+  const q: Quotation = res
   quotationId.value = q.quotation_id
   inquiryId.value = q.inquiry_id || ''
   customerId.value = q.customer_id

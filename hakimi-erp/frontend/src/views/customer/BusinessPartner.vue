@@ -291,7 +291,7 @@ async function loadPartners() {
   error.value = ''
   try {
     const res = await fetchPartners()
-    partners.value = res.data.items || []
+    partners.value = res.items || []
   } catch (err: any) {
     error.value = err?.response?.data?.detail || err.message || 'Failed to load business partners'
     console.error('Failed to fetch partners:', err)
@@ -383,7 +383,7 @@ async function handleSave() {
   saving.value = true
   try {
     const res = await createPartner(buildPayload())
-    successMsg.value = `Business Partner ${res.data.bp_id} created successfully!`
+    successMsg.value = `Business Partner ${res.bp_id} created successfully!`
     successVisible.value = true
     await loadPartners()
     Object.keys(form).forEach(key => (form as any)[key] = '')

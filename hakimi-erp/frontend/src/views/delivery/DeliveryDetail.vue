@@ -190,15 +190,15 @@ async function load() {
   try {
     const [delRes, partRes, matRes] = await Promise.all([
       fetchDeliveryById(deliveryId.value),
-      fetchPartners({ limit: 1000 }),
-      fetchMaterials({ limit: 1000 })
+      fetchPartners({ page_size: 100 }),
+      fetchMaterials({ page_size: 100 })
     ])
-    delivery.value = delRes.data
-    partnerMap.value = (partRes.data.items || []).reduce((acc: Record<string, Partner>, p: Partner) => {
+    delivery.value = delRes
+    partnerMap.value = (partRes.items || []).reduce((acc: Record<string, Partner>, p: Partner) => {
       if (p.bp_id) acc[p.bp_id] = p
       return acc
     }, {})
-    materialMap.value = (matRes.data.items || []).reduce((acc: Record<string, Material>, m: Material) => {
+    materialMap.value = (matRes.items || []).reduce((acc: Record<string, Material>, m: Material) => {
       if (m.material_id) acc[m.material_id] = m
       return acc
     }, {})

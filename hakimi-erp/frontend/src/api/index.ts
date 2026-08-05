@@ -5,4 +5,4 @@ export * from './modules/sales'
 export * from './modules/logistics'
 export * from './modules/finance'
 
-export { default as request, get, post, put, del } from './request'
+export { default as request, get, post, put, patch, del } from './request'

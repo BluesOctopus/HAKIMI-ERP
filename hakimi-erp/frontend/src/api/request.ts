@@ -8,7 +8,6 @@ export interface ApiResponse<T = unknown> {
 }
 
 const request: AxiosInstance = axios.create({
-  baseURL: '/api',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
@@ -50,6 +49,11 @@ export async function post<T>(url: string, data?: unknown, config?: AxiosRequest
 
 export async function put<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
   const res = await request.put<ApiResponse<T>>(url, data, config)
+  return res.data.data
+}
+
+export async function patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  const res = await request.patch<ApiResponse<T>>(url, data, config)
   return res.data.data
 }
 

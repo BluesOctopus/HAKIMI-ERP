@@ -29,7 +29,14 @@ export interface Inquiry {
 
 export interface InquiryList {
   items: Inquiry[]
+  pagination: Pagination
+}
+
+interface Pagination {
+  page: number
+  page_size: number
   total: number
+  total_pages: number
 }
 
 export interface QuotationItem {
@@ -58,7 +65,7 @@ export interface Quotation {
 
 export interface QuotationList {
   items: Quotation[]
-  total: number
+  pagination: Pagination
 }
 
 export interface SalesOrderItem {
@@ -89,7 +96,7 @@ export interface SalesOrder {
 
 export interface SalesOrderList {
   items: SalesOrder[]
-  total: number
+  pagination: Pagination
 }
 
 // Inquiry APIs

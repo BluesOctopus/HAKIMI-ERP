@@ -204,13 +204,13 @@ function fmt(n: number) {
 
 async function loadInvoiceById(id: string) {
   const res = await fetchInvoiceById(id)
-  invoice.value = res.data
+  invoice.value = res
 }
 
 async function findARAndInvoice(id: string) {
-  const [openRes, closedRes] = await Promise.all([fetchOpenAR({ limit: 1000 }), fetchClosedAR({ limit: 1000 })])
-  const openItems = openRes.data.items || []
-  const closedItems = closedRes.data.items || []
+  const [openRes, closedRes] = await Promise.all([fetchOpenAR({ page_size: 100 }), fetchClosedAR({ page_size: 100 })])
+  const openItems = openRes.items || []
+  const closedItems = closedRes.items || []
   const open = openItems.find((i: any) => i.open_ar_id === id || i.invoice_id === id)
   const closed = closedItems.find((i: any) => i.closed_ar_id === id || i.invoice_id === id)
   if (open) openAr.value = open
@@ -220,8 +220,8 @@ async function findARAndInvoice(id: string) {
 }
 
 async function loadPartners() {
-  const res = await fetchPartners({ limit: 1000 })
-  partnerMap.value = (res.data.items || []).reduce((acc: Record<string, Partner>, p: Partner) => {
+  const res = await fetchPartners({ page_size: 100 })
+  partnerMap.value = (res.items || []).reduce((acc: Record<string, Partner>, p: Partner) => {
     if (p.bp_id) acc[p.bp_id] = p
     return acc
   }, {})

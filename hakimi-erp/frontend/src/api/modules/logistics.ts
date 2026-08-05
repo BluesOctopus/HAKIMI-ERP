@@ -28,7 +28,14 @@ export interface Delivery {
 
 export interface DeliveryList {
   items: Delivery[]
+  pagination: Pagination
+}
+
+interface Pagination {
+  page: number
+  page_size: number
   total: number
+  total_pages: number
 }
 
 export function fetchDeliveries(params?: Record<string, any>) {

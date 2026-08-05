@@ -1,4 +1,4 @@
-import { get, post, put, del } from '../request'
+import { get, post, patch, del } from '../request'
 import { MASTER_API } from '@/constants/api'
 
 export interface Partner {
@@ -23,7 +23,14 @@ export interface Partner {
 
 export interface PartnerList {
   items: Partner[]
+  pagination: Pagination
+}
+
+interface Pagination {
+  page: number
+  page_size: number
   total: number
+  total_pages: number
 }
 
 export interface Material {
@@ -37,7 +44,7 @@ export interface Material {
 
 export interface MaterialList {
   items: Material[]
-  total: number
+  pagination: Pagination
 }
 
 export function fetchPartners(params?: Record<string, any>) {
@@ -49,7 +56,7 @@ export function createPartner(data: Partial<Partner>) {
 }
 
 export function updatePartner(id: string, data: Partial<Partner>) {
-  return put<Partner>(`${MASTER_API.partners}${id}`, data)
+  return patch<Partner>(`${MASTER_API.partners}${id}`, data)
 }
 
 export function fetchMaterials(params?: Record<string, any>) {
@@ -61,7 +68,7 @@ export function createMaterial(data: Partial<Material>) {
 }
 
 export function updateMaterial(id: string, data: Partial<Material>) {
-  return put<Material>(`${MASTER_API.materials}${id}`, data)
+  return patch<Material>(`${MASTER_API.materials}${id}`, data)
 }
 
 export function deleteMaterial(id: string) {

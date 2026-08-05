@@ -9,6 +9,10 @@ class MaterialService:
         return db.query(Material).offset(skip).limit(limit).all()
 
     @staticmethod
+    def count_materials(db: Session) -> int:
+        return db.query(Material).count()
+
+    @staticmethod
     def get_material(db: Session, material_id: str) -> Optional[Material]:
         return db.query(Material).filter(Material.material_id == material_id).first()
 
@@ -37,7 +41,9 @@ class MaterialService:
         db_material = MaterialService.get_material(db, material_id)
         if not db_material:
             return False
-        db.delete(db_material)
+        # Materials are referenced by sales, delivery, invoice, and pricing rows.
+        # Keep the row for historical documents and make it unavailable instead.
+        db_material.status = "INACTIVE"
         db.commit()
         return True
 
@@ -54,5 +60,18 @@ class MaterialService:
         if bp_id:
             q = q.filter(PricingCondition.bp_id == bp_id)
         return q.offset(skip).limit(limit).all()
+
+    @staticmethod
+    def count_pricing_conditions(db: Session, condition_type: Optional[str] = None,
+                                 material_id: Optional[str] = None,
+                                 bp_id: Optional[str] = None) -> int:
+        q = db.query(PricingCondition)
+        if condition_type:
+            q = q.filter(PricingCondition.condition_type == condition_type)
+        if material_id:
+            q = q.filter(PricingCondition.material_id == material_id)
+        if bp_id:
+            q = q.filter(PricingCondition.bp_id == bp_id)
+        return q.count()
 
 material_service = MaterialService()
