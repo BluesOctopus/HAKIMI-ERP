@@ -12,6 +12,13 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = ""
     DB_NAME: str = "hakimi_erp"
 
+    # LLM (Kimi / Moonshot) configuration for the in-app assistant
+    LLM_API_KEY: str = ""
+    LLM_BASE_URL: str = "https://api.moonshot.cn/v1"
+    LLM_MODEL: str = "kimi-k2.6"
+    LLM_TIMEOUT: float = 60.0
+    LLM_MAX_TOKENS: int = 2048
+
     class Config:
         env_file = ".env"
         case_sensitive = True

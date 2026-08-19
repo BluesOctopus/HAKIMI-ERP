@@ -98,7 +98,7 @@
             <p class="assistant-headline">Let's work smarter, together.</p>
             <p class="assistant-desc">Need help with order processing, delivery tracking, or financial reports? The AI assistant is ready to guide you through every workflow.</p>
           </div>
-          <button class="assistant-cta">Ask a question</button>
+          <button class="assistant-cta" @click="assistantStore.open()">Ask a question</button>
         </div>
     </section>
   </div>
@@ -109,6 +109,9 @@ import { ref, computed, onMounted } from 'vue'
 import IndicatorCard from '@/components/IndicatorCard.vue'
 import { fetchDashboardSummary } from '@/api/modules/report'
 import { formatCurrency, formatNumber } from '@/utils/format'
+import { useAssistantStore } from '@/stores/assistant'
+
+const assistantStore = useAssistantStore()
 
 const loading = ref(true)
 const error = ref('')
