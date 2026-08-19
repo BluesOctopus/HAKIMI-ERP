@@ -42,7 +42,7 @@
         >
           <svg class="section-icon" viewBox="0 0 20 20" width="18" height="18" v-html="section.icon" style="pointer-events: none;"></svg>
           <div class="section-label-wrap" v-show="!isCollapsed" style="pointer-events: none;">
-            <span class="section-label">{{ section.label }}</span>
+            <span class="section-label">{{ displayLabel(section.label) }}</span>
           </div>
           <svg v-show="!isCollapsed" class="section-chevron" viewBox="0 0 16 16" width="12" height="12" style="pointer-events: none;">
             <path d="M5 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -59,7 +59,7 @@
                   @click="navigate">
                 <div class="nav-item-inner">
                   <svg class="nav-icon nav-sub-icon" viewBox="0 0 20 20" width="16" height="16" v-html="item.icon"></svg>
-                  <span class="nav-text nav-sub-text">{{ item.label }}</span>
+                  <span class="nav-text nav-sub-text">{{ displayLabel(item.label) }}</span>
                 </div>
               </li>
             </RouterLink>
@@ -74,16 +74,6 @@
           <path fill="none" d="M12 4l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </button>
-      <div class="assistant-entry" v-show="!isCollapsed">
-        <svg viewBox="0 0 24 24" width="20" height="20" class="assistant-icon">
-          <circle cx="12" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M8 20c0-2.2 1.8-4 4-4s4 1.8 4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="10" cy="9" r="1" fill="currentColor"/>
-          <circle cx="14" cy="9" r="1" fill="currentColor"/>
-          <path d="M10 14h4" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
-        <span class="assistant-label">AI Assistant</span>
-      </div>
     </div>
   </aside>
 </template>
@@ -91,15 +81,48 @@
 <script setup lang="ts">
 import { ref, computed, reactive, watch } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { usePreferencesStore } from '@/stores/preferences'
 
 const route = useRoute()
 const router = useRouter()
+const preferences = usePreferencesStore()
 const isCollapsed = ref(false)
 const currentPath = computed(() => route.path)
 const expandedSections = reactive(new Set<string>())
 
 interface MenuItem { path: string; label: string; icon: string }
 interface MenuSection { label: string; icon: string; children: MenuItem[] }
+
+const navLabelMap: Record<string, string> = {
+  'Home': '首页',
+  'Customer\nManagement': '客户管理',
+  'Business Partner': '业务伙伴',
+  'Material': '物料主数据',
+  'Product': '产品',
+  'Pricing Conditions': '定价条件',
+  'Sales Organization': '销售组织',
+  'Sales\nManagement': '销售管理',
+  'Inquiry': '询价管理',
+  'Quotation Management': '报价管理',
+  'Sales Orders': '销售订单',
+  'Delivery\nManagement': '配送管理',
+  'Delivery List': '发货单列表',
+  'Status Monitoring': '配送状态监控',
+  'Financial Management': '财务管理',
+  'Invoice Management': '发票管理',
+  'Invoice': '发票',
+  'Receivables Management': '应收管理',
+  'Receivables': '应收',
+  'Unpaid Receivables': '未收应收',
+  'Report\nQuery': '报表查询',
+  'System\nSettings': '系统设置',
+}
+
+function displayLabel(label: string): string {
+  if (preferences.locale !== 'zh') return label
+  return navLabelMap[label] || label
+}
+
 
 const menuItems: MenuSection[] = [
   {

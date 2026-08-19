@@ -52,14 +52,16 @@ class LogisticsService:
                     BusinessPartner.search_term.like(f"%{customer_name}%")
                 )
             )
+        reverse_map = {
+            "Creating": "OPEN", "Picking": "PICKING",
+            "Picked": "SHIPPED", "Shipped": "SHIPPED", "In Transit": "IN_TRANSIT",
+            "Completed": "PGI_DONE", "Cancelled": "CANCELLED"
+        }
         if status:
-            reverse_map = {
-                "Creating": "OPEN", "Picking": "PICKING",
-                "Picked": "SHIPPED", "Shipped": "SHIPPED", "In Transit": "IN_TRANSIT",
-                "Completed": "PGI_DONE", "Cancelled": "CANCELLED"
-            }
             db_status = reverse_map.get(status, status)
             query = query.filter(Delivery.delivery_status == db_status)
+        else:
+            query = query.filter(Delivery.delivery_status != "CANCELLED")
 
         total = query.count()
         deliveries = query.order_by(Delivery.delivery_id.desc()).offset(skip).limit(limit).all()
@@ -177,6 +179,14 @@ class LogisticsService:
     # --- Create Delivery ---
     @staticmethod
     def create_delivery(db: Session, data: DeliveryCreate) -> dict:
+        if data.sales_order_id:
+            existing = db.query(Delivery).filter(
+                Delivery.sales_order_id == data.sales_order_id,
+                Delivery.delivery_status != "CANCELLED",
+            ).first()
+            if existing:
+                raise Exception(f"Delivery already exists for sales order {data.sales_order_id}: {existing.delivery_id}")
+
         db_delivery = Delivery(
             delivery_id=data.delivery_id,
             sales_order_id=data.sales_order_id,
@@ -213,6 +223,13 @@ class LogisticsService:
         so = db.query(SalesOrder).options(joinedload(SalesOrder.items)).filter(SalesOrder.sales_order_id == sales_order_id).first()
         if not so:
             raise Exception("Sales order not found")
+
+        existing = db.query(Delivery).filter(
+            Delivery.sales_order_id == sales_order_id,
+            Delivery.delivery_status != "CANCELLED",
+        ).first()
+        if existing:
+            raise Exception(f"Delivery already exists for sales order {sales_order_id}: {existing.delivery_id}")
 
         timestamp = datetime.now().strftime('%y%m%d%H%M%S')
         delivery_id = f"DEL{timestamp}"
@@ -376,6 +393,15 @@ class LogisticsService:
         if db_delivery.delivery_status != "IN_TRANSIT":
             raise Exception("Goods Issue can only be posted after the delivery is in transit")
 
+        incomplete_picks = []
+        for item in db_delivery.items:
+            picked_qty = item.picked_quantity or Decimal(0)
+            needed_qty = item.delivery_quantity or Decimal(0)
+            if picked_qty < needed_qty:
+                incomplete_picks.append(f"Item {item.item_no}: picked {picked_qty}/{needed_qty}")
+        if incomplete_picks:
+            raise Exception("Cannot post Goods Issue: delivery is not fully picked. " + "; ".join(incomplete_picks))
+
         timestamp = datetime.now().strftime('%y%m%d%H%M%S')
 
         # Find current max batch_no across existing GI records for this delivery
@@ -436,8 +462,13 @@ class LogisticsService:
                 item.item_status = "PARTIAL_ISSUED"
                 all_fully_issued = False
 
+        fully_picked = all(
+            (item.picked_quantity or Decimal(0)) >= (item.delivery_quantity or Decimal(0))
+            for item in db_delivery.items
+        )
+
         # Check if ALL items across ALL deliveries for this SO are fully issued
-        if all_fully_issued:
+        if all_fully_issued and fully_picked:
             db_delivery.delivery_status = "PGI_DONE"
             db_delivery.actual_gi_date = datetime.now()
 

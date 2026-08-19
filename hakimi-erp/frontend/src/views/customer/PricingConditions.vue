@@ -9,26 +9,26 @@
           </svg>
         </div>
         <div class="hc-text">
-          <h2 class="hc-title">Pricing Conditions</h2>
-          <p class="hc-sub">Define and maintain pricing condition records for materials and customers.</p>
+          <h2 class="hc-title">{{ isZh ? '\u5b9a\u4ef7\u6761\u4ef6' : 'Pricing Conditions' }}</h2>
+          <p class="hc-sub">{{ isZh ? '\u5b9a\u4e49\u5e76\u7ef4\u62a4\u7269\u6599\u4e0e\u5ba2\u6237\u7684\u5b9a\u4ef7\u6761\u4ef6\u8bb0\u5f55\u3002' : 'Define and maintain pricing condition records for materials and customers.' }}</p>
         </div>
       </div>
     </div>
-    <div v-if="loading" class="loading-msg">Loading pricing conditions...</div>
+    <div v-if="loading" class="loading-msg">{{ isZh ? '\u6b63\u5728\u52a0\u8f7d\u5b9a\u4ef7\u6761\u4ef6...' : 'Loading pricing conditions...' }}</div>
     <div v-else-if="error" class="error-msg">{{ error }}</div>
     <div v-else class="data-card">
       <table class="dt">
         <thead>
           <tr>
-            <th>Cond. Type</th>
-            <th>Name</th>
-            <th>Material</th>
-            <th>Customer</th>
-            <th class="num">Amount</th>
-            <th>Crcy</th>
-            <th>Valid From</th>
-            <th>Valid To</th>
-            <th>Status</th>
+            <th>{{ isZh ? '\u6761\u4ef6\u7c7b\u578b' : 'Cond. Type' }}</th>
+            <th>{{ isZh ? '\u540d\u79f0' : 'Name' }}</th>
+            <th>{{ isZh ? '\u7269\u6599' : 'Material' }}</th>
+            <th>{{ isZh ? '\u5ba2\u6237' : 'Customer' }}</th>
+            <th class="num">{{ isZh ? '\u91d1\u989d' : 'Amount' }}</th>
+            <th>{{ isZh ? '\u5e01\u79cd' : 'Crcy' }}</th>
+            <th>{{ isZh ? '\u6709\u6548\u671f\u81ea' : 'Valid From' }}</th>
+            <th>{{ isZh ? '\u6709\u6548\u671f\u81f3' : 'Valid To' }}</th>
+            <th>{{ isZh ? '\u72b6\u6001' : 'Status' }}</th>
           </tr>
         </thead>
         <tbody>
@@ -50,9 +50,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { usePreferencesStore } from '@/stores/preferences'
 import { fetchPricingConditions } from '@/api'
 
+const preferences = usePreferencesStore()
+const isZh = computed(() => preferences.locale === 'zh')
 const rows = ref<any[]>([])
 const loading = ref(true)
 const error = ref('')

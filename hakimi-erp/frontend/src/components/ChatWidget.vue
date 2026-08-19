@@ -10,11 +10,9 @@
       @click="onLauncherClick"
     >
       <svg viewBox="0 0 24 24" width="24" height="24">
-        <path
-          d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H9l-4.2 3.4c-.4.3-.8 0-.8-.4V5.5z"
-          fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"
-        />
-        <path d="M8.5 9h7M8.5 12h4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M12 3l1.8 4.4L18 9l-4.2 1.6L12 15l-1.8-4.4L6 9l4.2-1.6L12 3z" fill="currentColor"/>
+        <path d="M18.5 14l.9 2.2 2.2.8-2.2.9-.9 2.1-.8-2.1-2.2-.9 2.2-.8.8-2.2z" fill="currentColor"/>
+        <path d="M5 13.5l.7 1.7 1.7.7-1.7.7-.7 1.6-.6-1.6-1.7-.7 1.7-.7.6-1.7z" fill="currentColor"/>
       </svg>
     </button>
 
@@ -109,6 +107,7 @@
 
         <footer class="chat-input-area">
           <input
+            ref="inputEl"
             v-model="draft"
             class="chat-input"
             type="text"
@@ -123,7 +122,7 @@
             @click="ask(draft)"
           >
             <svg viewBox="0 0 20 20" width="16" height="16">
-              <path d="M3 10l14-7-4.5 7L17 17 3 10z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+              <path d="M3 10h13M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
         </footer>
@@ -143,6 +142,7 @@ const router = useRouter()
 
 const draft = ref('')
 const messagesEl = ref<HTMLElement | null>(null)
+const inputEl = ref<HTMLInputElement | null>(null)
 const loading = computed(() => store.loading)
 
 /* ---------- dragging (window + launcher) ---------- */
@@ -239,7 +239,19 @@ function onWinPointerDown(e: PointerEvent) {
 watch(
   () => store.isOpen,
   (open) => {
-    if (open) winPos.value = clampPos(winPos.value.x, winPos.value.y, WIN_W, WIN_H)
+    if (open) {
+      winPos.value = clampPos(winPos.value.x, winPos.value.y, WIN_W, WIN_H)
+      if (!store.pendingPrompt) nextTick(() => inputEl.value?.focus())
+    }
+  },
+)
+
+watch(
+  () => store.pendingPrompt,
+  (prompt) => {
+    if (!prompt) return
+    draft.value = store.consumePendingPrompt()
+    nextTick(() => inputEl.value?.focus())
   },
 )
 

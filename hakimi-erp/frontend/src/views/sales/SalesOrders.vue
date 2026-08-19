@@ -8,8 +8,8 @@
           </svg>
         </div>
         <div class="hc-text">
-          <h2 class="hc-title">Sales Orders</h2>
-          <p class="hc-sub">Manage and track all sales orders across the organization.</p>
+          <h2 class="hc-title">{{ isZh ? '\u9500\u552e\u8ba2\u5355' : 'Sales Orders' }}</h2>
+          <p class="hc-sub">{{ isZh ? '\u7ba1\u7406\u5e76\u8ddf\u8e2a\u4f01\u4e1a\u5185\u7684\u6240\u6709\u9500\u552e\u8ba2\u5355\u3002' : 'Manage and track all sales orders across the organization.' }}</p>
         </div>
       </div>
       <div class="hc-right">
@@ -17,35 +17,35 @@
           <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right: 4px;">
             <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          Create Order
+          {{ isZh ? '\u521b\u5efa\u9500\u552e\u8ba2\u5355' : 'Create Order' }}
         </button>
       </div>
     </div>
 
     <div class="filter-bar">
-      <input type="text" class="form-input search-so" v-model="filter.salesOrderNo" placeholder="Order No." />
-      <input type="text" class="form-input search-cust" v-model="filter.customerName" placeholder="Customer Name" />
+      <input type="text" class="form-input search-so" v-model="filter.salesOrderId" :placeholder="isZh ? '\u8ba2\u5355\u53f7' : 'Order No.'" />
+      <input type="text" class="form-input search-cust" v-model="filter.customerName" :placeholder="isZh ? '\u5ba2\u6237\u540d\u79f0' : 'Customer Name'" />
       <select class="form-select search-st" v-model="filter.status">
-        <option value="">All Statuses</option>
-        <option value="OPEN">Open</option>
-        <option value="IN_PROCESS">In Process</option>
-        <option value="COMPLETED">Completed</option>
-        <option value="CANCELLED">Cancelled</option>
+        <option value="">{{ isZh ? '\u5168\u90e8\u72b6\u6001' : 'All Statuses' }}</option>
+        <option value="OPEN">{{ isZh ? '\u6253\u5f00' : 'Open' }}</option>
+        <option value="IN_PROCESS">{{ isZh ? '\u5904\u7406\u4e2d' : 'In Process' }}</option>
+        <option value="COMPLETED">{{ isZh ? '\u5df2\u5b8c\u6210' : 'Completed' }}</option>
+        <option value="CANCELLED">{{ isZh ? '\u5df2\u53d6\u6d88' : 'Cancelled' }}</option>
       </select>
-      <button class="btn btn-primary" @click="fetchData">Search</button>
-      <button class="btn btn-outline" @click="resetFilter">Reset</button>
+      <button class="btn btn-primary" @click="fetchData">{{ isZh ? '\u67e5\u8be2' : 'Search' }}</button>
+      <button class="btn btn-outline" @click="resetFilter">{{ isZh ? '\u91cd\u7f6e' : 'Reset' }}</button>
     </div>
 
     <div class="data-card">
       <table class="data-table">
         <thead>
           <tr>
-            <th>Order No.</th>
-            <th>Customer</th>
-            <th>Order Date</th>
-            <th class="num">Net Value</th>
-            <th>Status</th>
-            <th>Action</th>
+            <th>{{ isZh ? '\u8ba2\u5355\u53f7' : 'Order No.' }}</th>
+            <th>{{ isZh ? '\u5ba2\u6237' : 'Customer' }}</th>
+            <th>{{ isZh ? '\u8ba2\u5355\u65e5\u671f' : 'Order Date' }}</th>
+            <th class="num">{{ isZh ? '\u51c0\u503c' : 'Net Value' }}</th>
+            <th>{{ isZh ? '\u72b6\u6001' : 'Status' }}</th>
+            <th>{{ isZh ? '\u64cd\u4f5c' : 'Action' }}</th>
           </tr>
         </thead>
         <tbody>
@@ -56,21 +56,21 @@
             <td class="num mono">{{ r.val }}</td>
             <td><span class="stag" :class="sc(r.st)">{{ r.stLabel }}</span></td>
             <td>
-              <a class="link" @click="viewDetail(r.id)">Edit</a>
+              <a class="link" @click="viewDetail(r.id)">{{ isZh ? '\u7f16\u8f91' : 'Edit' }}</a>
               <span class="divider" v-if="r.st === 'OPEN' || r.st === 'IN_PROCESS'">|</span>
-              <a class="link" v-if="r.st === 'OPEN' || r.st === 'IN_PROCESS'" @click="convertToDelivery(r.id)">Convert to Delivery</a>
+              <a class="link" v-if="r.st === 'OPEN' || r.st === 'IN_PROCESS'" @click="convertToDelivery(r.id)">{{ isZh ? '\u8f6c\u4e3a\u53d1\u8d27\u5355' : 'Convert to Delivery' }}</a>
             </td>
           </tr>
           <tr v-if="rows.length === 0 && !loading">
-            <td colspan="6" style="text-align:center;padding:40px;color:#999;">No orders found.</td>
+            <td colspan="6" style="text-align:center;padding:40px;color:#999;">{{ isZh ? '\u672a\u627e\u5230\u9500\u552e\u8ba2\u5355\u3002' : 'No orders found.' }}</td>
           </tr>
           <tr v-if="loading">
-            <td colspan="6" style="text-align:center;padding:40px;color:#999;">Loading...</td>
+            <td colspan="6" style="text-align:center;padding:40px;color:#999;">{{ isZh ? '\u52a0\u8f7d\u4e2d\u002e\u002e\u002e' : 'Loading...' }}</td>
           </tr>
         </tbody>
       </table>
       <div class="table-footer">
-        <span class="tf-total">Total {{ rows.length }} items</span>
+        <span class="tf-total">{{ isZh ? `\u5171 ${rows.length} \u6761` : `Total ${rows.length} items` }}</span>
         <div class="pager">
           <button class="pg-btn active">1</button>
         </div>
@@ -80,27 +80,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue"
+import { ref, reactive, computed, onMounted } from "vue"
 import { useRouter } from "vue-router"
+import { usePreferencesStore } from '@/stores/preferences'
 import { alert, confirm } from "@/utils/toast"
 import { fetchOrders, createDeliveryFromSalesOrder } from "@/api"
 
 const router = useRouter()
+const preferences = usePreferencesStore()
+const isZh = computed(() => preferences.locale === 'zh')
 interface R{id:string;no:string;cust:string;date:string;val:string;st:string}
 const rows = ref<R[]>([])
 const loading = ref(false)
 
 const filter = reactive({
-  salesOrderNo: '',
+  salesOrderId: '',
   customerName: '',
   status: ''
 })
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS_ZH: Record<string, string> = {
+  OPEN: '\u6253\u5f00',
+  IN_PROCESS: '\u5904\u7406\u4e2d',
+  COMPLETED: '\u5df2\u5b8c\u6210',
+  CANCELLED: '\u5df2\u53d6\u6d88'
+}
+const STATUS_LABELS_EN: Record<string, string> = {
   OPEN: 'Open',
   IN_PROCESS: 'In Process',
   COMPLETED: 'Completed',
   CANCELLED: 'Cancelled'
+}
+function statusLabel(status: string) {
+  return (isZh.value ? STATUS_LABELS_ZH : STATUS_LABELS_EN)[status] || status
 }
 
 async function fetchData() {
@@ -115,7 +127,7 @@ async function fetchData() {
       date: i.createdTime?.split('T')[0] || 'N/A',
       val: `¥${(i.netValue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       st: i.status,
-      stLabel: STATUS_LABELS[i.status] || i.status
+      stLabel: statusLabel(i.status)
     }))
   } catch (err: any) {
     console.error("Fetch error:", err)
@@ -125,7 +137,7 @@ async function fetchData() {
 }
 
 function resetFilter() {
-  Object.assign(filter, { salesOrderNo: '', customerName: '', status: '' })
+  Object.assign(filter, { salesOrderId: '', customerName: '', status: '' })
   fetchData()
 }
 
@@ -136,13 +148,13 @@ function viewDetail(id:string){
   router.push(`/sales/order/${id}`)
 }
 async function convertToDelivery(id:string) {
-  if (await confirm(`Create delivery for order ${id}?`)) {
+  if (await confirm(isZh.value ? `\u662f\u5426\u4e3a\u9500\u552e\u8ba2\u5355 ${id} \u521b\u5efa\u53d1\u8d27\u5355\uff1f` : `Create delivery for order ${id}?`)) {
     try {
       const res = await createDeliveryFromSalesOrder(id)
-      alert(`Delivery ${res.deliveryId} created successfully!`)
+      alert(isZh.value ? `\u53d1\u8d27\u5355 ${res.deliveryId} \u521b\u5efa\u6210\u529f\uff01` : `Delivery ${res.deliveryId} created successfully!`)
       router.push("/delivery/list")
     } catch (err: any) {
-      alert("Failed to create delivery: " + err.message)
+      alert((isZh.value ? '\u521b\u5efa\u53d1\u8d27\u5355\u5931\u8d25\uff1a' : 'Failed to create delivery: ') + err.message)
     }
   }
 }

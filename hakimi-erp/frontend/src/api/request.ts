@@ -2,6 +2,7 @@ import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, type Ax
 import camelcaseKeys from 'camelcase-keys'
 import snakecaseKeys from 'snakecase-keys'
 import { clearAuth, getAuthToken } from '@/utils/auth'
+import { useNotificationsStore } from '@/stores/notifications'
 
 export interface ApiResponse<T = unknown> {
   success: boolean
@@ -17,6 +18,130 @@ const request: AxiosInstance = axios.create({
     'Content-Type': 'application/json',
   },
 })
+
+function notifyMutation(method: string | undefined, url: string | undefined, data: unknown) {
+  if (!method || !url) return
+  const httpMethod = method.toLowerCase()
+  if (!['post', 'put', 'patch', 'delete'].includes(httpMethod)) return
+  if (url.includes('/auth/') || url.includes('/assistant/')) return
+
+  const payload = (data && typeof data === 'object' ? data : {}) as Record<string, any>
+  const store = useNotificationsStore()
+
+  const idKeys = ['salesOrderId', 'deliveryId', 'invoiceId', 'receiptId', 'quotationId', 'inquiryId', 'bpId', 'materialId', 'openArId', 'closedArId']
+  let id = ''
+  for (const key of idKeys) {
+    if (typeof payload[key] === 'string' && payload[key]) {
+      id = payload[key]
+      break
+    }
+  }
+  if (!id) {
+    const match = url.match(/\/([A-Za-z0-9_-]+)(?:\/|$)/g)
+    if (match) {
+      const last = match[match.length - 1].replace(/\//g, '')
+      if (!['deliveries', 'invoices', 'receipts', 'partners', 'materials', 'orders', 'inquiries', 'quotations', 'start-picking', 'confirm-picking', 'pick-batch', 'ship', 'pgi', 'void', 'from-delivery', 'pricing-conditions', 'sales-organizations'].includes(last)) {
+        id = last
+      }
+    }
+  }
+
+  const titleFor = (created: string, updated: string, deleted?: string): string => {
+    if (httpMethod === 'delete' && deleted) return deleted
+    return httpMethod === 'post' ? created : updated
+  }
+  const idText = (prefix: string, suffix: string): string => (id ? `${prefix} ${id} ${suffix}` : `${prefix}${suffix}`)
+
+  let title = ''
+  let text = ''
+  let tone: 'success' | 'warning' | 'danger' = 'success'
+
+  if (url.includes('/sales/inquiries')) {
+    title = titleFor('Inquiry created', 'Inquiry updated')
+    text = idText('Inquiry', 'has been processed.')
+  } else if (url.includes('/sales/quotations')) {
+    title = titleFor('Quotation created', 'Quotation updated')
+    text = idText('Quotation', 'has been processed.')
+  } else if (url.includes('/sales/orders')) {
+    if (httpMethod === 'delete') {
+      tone = 'danger'
+      title = 'Sales order deleted'
+      text = id ? `Sales order ${id} has been deleted.` : 'Sales order has been deleted.'
+    } else {
+      title = titleFor('Sales order created', 'Sales order updated')
+      text = id ? `Sales order ${id} has been processed.` : 'Sales order has been processed.'
+    }
+  } else if (url.includes('/logistics/deliveries')) {
+    if (url.includes('/from-so/')) {
+      title = 'Delivery created'
+      text = id ? `Delivery ${id} was created from the sales order.` : 'Delivery created.'
+    } else if (url.includes('/start-picking')) {
+      title = 'Picking started'
+      text = id ? `Delivery ${id} has started picking.` : 'Picking started.'
+    } else if (url.includes('/confirm-picking')) {
+      title = 'Picking confirmed'
+      text = id ? `Delivery ${id} picking confirmed.` : 'Picking confirmed.'
+    } else if (url.includes('/pick-batch')) {
+      title = 'Batch picking completed'
+      text = id ? `Batch picking completed for delivery ${id}.` : 'Batch picking completed.'
+    } else if (url.includes('/ship')) {
+      title = 'Delivery shipped'
+      text = id ? `Delivery ${id} has shipped.` : 'Delivery shipped.'
+    } else if (url.includes('/pgi')) {
+      title = 'Goods issue posted'
+      text = id ? `Goods issue posted for delivery ${id}.` : 'Goods issue posted.'
+    } else {
+      title = 'Delivery updated'
+      text = id ? `Delivery ${id} has been processed.` : 'Delivery processed.'
+    }
+  } else if (url.includes('/finance/invoices/from-delivery/')) {
+    title = 'Invoice created'
+    text = id ? `Invoice ${id} has been created.` : 'Invoice created.'
+  } else if (url.includes('/finance/invoices') && url.includes('/void')) {
+    tone = 'warning'
+    title = 'Invoice voided'
+    text = id ? `Invoice ${id} has been voided.` : 'Invoice voided.'
+  } else if (url.includes('/finance/invoices')) {
+    title = 'Invoice updated'
+    text = id ? `Invoice ${id} has been processed.` : 'Invoice processed.'
+  } else if (url.includes('/finance/receipts')) {
+    title = 'Receipt created'
+    text = id ? `Receipt ${id} has been recorded.` : 'Receipt recorded.'
+  } else if (url.includes('/master/partners')) {
+    if (httpMethod === 'delete') {
+      tone = 'danger'
+      title = 'Business partner deleted'
+      text = id ? `Business partner ${id} has been deleted.` : 'Business partner deleted.'
+    } else {
+      title = 'Business partner saved'
+      text = id ? `Business partner ${id} has been processed.` : 'Business partner processed.'
+    }
+  } else if (url.includes('/master/materials/pricing-conditions')) {
+    title = 'Pricing conditions updated'
+    text = 'Material pricing conditions saved.'
+  } else if (url.includes('/master/materials/sales-organizations')) {
+    title = 'Sales organizations updated'
+    text = 'Sales organization data saved.'
+  } else if (url.includes('/master/materials')) {
+    if (httpMethod === 'delete') {
+      tone = 'danger'
+      title = 'Material deleted'
+      text = id ? `Material ${id} has been deleted.` : 'Material deleted.'
+    } else {
+      title = 'Material saved'
+      text = id ? `Material ${id} has been processed.` : 'Material processed.'
+    }
+  } else if (httpMethod === 'delete') {
+    tone = 'danger'
+    title = 'Record deleted'
+    text = id ? `Record ${id} has been deleted.` : 'Record deleted.'
+  } else {
+    title = httpMethod === 'post' ? 'Operation completed' : 'Record updated'
+    text = id ? `Record ${id} has been processed.` : 'The system processed your request.'
+  }
+
+  store.push({ title, text, tone })
+}
 
 request.interceptors.request.use(
   (config) => {
@@ -44,6 +169,7 @@ request.interceptors.response.use(
     if (response.data && response.data.data) {
       response.data.data = camelcaseKeys(response.data.data, { deep: true })
     }
+    notifyMutation(response.config.method, response.config.url, response.data.data)
     return response
   },
   (error: AxiosError<ApiResponse>) => {

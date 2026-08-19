@@ -149,6 +149,14 @@ class SalesService:
     def create_order(db: Session, order_in: SalesOrderCreate) -> SalesOrder:
         data = order_in.model_dump()
         items_data = data.pop("items")
+
+        requested_id = (data.get("sales_order_id") or "").strip()
+        if not requested_id:
+            raise Exception("Sales order ID is required")
+        if SalesService.get_order(db, requested_id):
+            raise Exception(f"Sales order ID already exists: {requested_id}")
+        data["sales_order_id"] = requested_id
+
         db_order = SalesOrder(**data)
         db.add(db_order)
         
@@ -176,6 +184,11 @@ class SalesService:
             raise Exception("Order not found")
         
         items_data = order_in.pop("items", [])
+        new_id = str(order_in.get("sales_order_id") or "").strip()
+        if new_id and new_id != sales_order_id:
+            existing = db.query(SalesOrder).filter(SalesOrder.sales_order_id == new_id).first()
+            if existing:
+                raise Exception(f"Sales order ID already exists: {new_id}")
         for key, value in order_in.items():
             if hasattr(db_order, key):
                 setattr(db_order, key, value)

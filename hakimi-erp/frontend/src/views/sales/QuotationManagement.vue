@@ -9,8 +9,8 @@
             </svg>
           </div>
           <div class="hc-text">
-            <h2 class="hc-title">Quotation Management</h2>
-            <p class="hc-sub">Manage customer quotes and convert them to sales orders.</p>
+            <h2 class="hc-title">{{ isZh ? '\u62a5\u4ef7\u7ba1\u7406' : 'Quotation Management' }}</h2>
+            <p class="hc-sub">{{ isZh ? '\u7ba1\u7406\u5ba2\u6237\u62a5\u4ef7\u5e76\u5c06\u5176\u8f6c\u4e3a\u9500\u552e\u8ba2\u5355\u3002' : 'Manage customer quotes and convert them to sales orders.' }}</p>
           </div>
         </div>
         <div class="hc-right">
@@ -18,34 +18,34 @@
             <svg viewBox="0 0 24 24" width="16" height="16" style="margin-right: 4px;">
               <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
-            Create Quotation
+            {{ isZh ? '\u521b\u5efa\u62a5\u4ef7' : 'Create Quotation' }}
           </button>
         </div>
       </div>
 
     <div class="filter-bar">
-      <input type="text" class="form-input search-qt" v-model="filter.quotationNo" placeholder="Quotation No." />
-      <input type="text" class="form-input search-cust" v-model="filter.customerName" placeholder="Customer" />
+      <input type="text" class="form-input search-qt" v-model="filter.quotationNo" :placeholder="isZh ? '\u62a5\u4ef7\u5355\u53f7' : 'Quotation No.'" />
+      <input type="text" class="form-input search-cust" v-model="filter.customerName" :placeholder="isZh ? '\u5ba2\u6237' : 'Customer'" />
       <select class="form-select search-st" v-model="filter.status">
-        <option value="">All Statuses</option>
-        <option value="OPEN">Open</option>
-        <option value="CLOSED">Closed</option>
+        <option value="">{{ isZh ? '\u5168\u90e8\u72b6\u6001' : 'All Statuses' }}</option>
+        <option value="OPEN">{{ isZh ? '\u6253\u5f00' : 'Open' }}</option>
+        <option value="CLOSED">{{ isZh ? '\u5df2\u5173\u95ed' : 'Closed' }}</option>
       </select>
-      <button class="btn btn-primary" @click="loadQuotations">Search</button>
-      <button class="btn btn-outline" @click="resetFilter">Reset</button>
+      <button class="btn btn-primary" @click="loadQuotations">{{ isZh ? '\u67e5\u8be2' : 'Search' }}</button>
+      <button class="btn btn-outline" @click="resetFilter">{{ isZh ? '\u91cd\u7f6e' : 'Reset' }}</button>
     </div>
 
       <div class="data-card">
         <table class="data-table">
           <thead>
             <tr>
-              <th>Quotation No.</th>
-              <th>Ref Inquiry</th>
-              <th>Customer</th>
-              <th>Valid Until</th>
-              <th class="num">Net Value</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th>{{ isZh ? '\u62a5\u4ef7\u5355\u53f7' : 'Quotation No.' }}</th>
+              <th>{{ isZh ? '\u53c2\u8003\u8be2\u4ef7' : 'Ref Inquiry' }}</th>
+              <th>{{ isZh ? '\u5ba2\u6237' : 'Customer' }}</th>
+              <th>{{ isZh ? '\u6709\u6548\u671f\u81f3' : 'Valid Until' }}</th>
+              <th class="num">{{ isZh ? '\u51c0\u503c' : 'Net Value' }}</th>
+              <th>{{ isZh ? '\u72b6\u6001' : 'Status' }}</th>
+              <th>{{ isZh ? '\u64cd\u4f5c' : 'Action' }}</th>
             </tr>
           </thead>
           <tbody>
@@ -57,21 +57,21 @@
               <td class="num mono">{{ r.val }}</td>
               <td><span class="stag" :class="sc(r.st)">{{ r.st }}</span></td>
               <td>
-                <a class="link" @click="viewDetail(r.id)">View</a>
+                <a class="link" @click="viewDetail(r.id)">{{ isZh ? '\u67e5\u770b' : 'View' }}</a>
                 <span class="divider" v-if="r.st === 'OPEN'">|</span>
-                <a class="link" v-if="r.st === 'OPEN'" @click="convertToOrder(r.id)">Convert to Order</a>
+                <a class="link" v-if="r.st === 'OPEN'" @click="convertToOrder(r.id)">{{ isZh ? '\u8f6c\u4e3a\u9500\u552e\u8ba2\u5355' : 'Convert to Order' }}</a>
               </td>
             </tr>
             <tr v-if="rows.length === 0 && !loading">
-              <td colspan="7" style="text-align:center;padding:40px;color:#999;">No quotations found.</td>
+              <td colspan="7" style="text-align:center;padding:40px;color:#999;">{{ isZh ? '\u672a\u627e\u5230\u62a5\u4ef7\u3002' : 'No quotations found.' }}</td>
             </tr>
             <tr v-if="loading">
-              <td colspan="7" style="text-align:center;padding:40px;color:#999;">Loading...</td>
+              <td colspan="7" style="text-align:center;padding:40px;color:#999;">{{ isZh ? '\u52a0\u8f7d\u4e2d...' : 'Loading...' }}</td>
             </tr>
           </tbody>
         </table>
         <div class="table-footer">
-          <span class="tf-total">Total {{ rows.length }} items</span>
+          <span class="tf-total">{{ isZh ? `\u5171 ${rows.length} \u6761` : `Total ${rows.length} items` }}</span>
           <div class="pager">
             <button class="pg-btn active">1</button>
           </div>
@@ -81,11 +81,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue"
+import { ref, reactive, onMounted, computed } from "vue"
+import { usePreferencesStore } from "@/stores/preferences"
 import { useRouter } from "vue-router"
 import { fetchQuotations } from "@/api"
 
 const router = useRouter()
+const preferences = usePreferencesStore()
+const isZh = computed(() => preferences.locale === "zh")
 const loading = ref(false)
 const filter = reactive({
   quotationNo: '',
@@ -121,7 +124,7 @@ async function loadQuotations() {
       cust: q.customerId,
       validTo: q.validTo || 'N/A',
       val: q.netValue ? `¥${q.netValue.toLocaleString()}` : '¥0.00',
-      st: q.status
+      st: statusLabel(q.status)
     }))
   } catch (err) {
     console.error("Fetch quotations failed:", err)
@@ -136,6 +139,13 @@ function resetFilter() {
 }
 
 onMounted(loadQuotations)
+
+function statusLabel(status: string) {
+  const labels: Record<string, string> = isZh.value
+    ? { OPEN: '\u6253\u5f00', CLOSED: '\u5df2\u5173\u95ed', CANCELLED: '\u5df2\u53d6\u6d88' }
+    : { OPEN: 'Open', CLOSED: 'Closed', CANCELLED: 'Cancelled' }
+  return labels[status] || status
+}
 
 function sc(s: string) {
   const m: Record<string, string> = {

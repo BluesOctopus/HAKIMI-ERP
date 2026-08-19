@@ -17,7 +17,7 @@
           @keydown.up.prevent="moveHighlight(-1)"
           @keydown.enter="selectHighlighted"
           @keydown.esc="closeSearch"
-          placeholder="Search pages and modules..."
+          :placeholder="isZh ? '\u641c\u7d22\u9875\u9762\u548c\u6a21\u5757...' : 'Search pages and modules...'"
           class="search-input"
         />
         <kbd class="search-kbd">Ctrl+K</kbd>
@@ -49,20 +49,86 @@
           </div>
         </transition>
       </div>
-      <button class="topbar-btn" title="Notifications">
-        <svg viewBox="0 0 20 20" width="19" height="19">
-          <path d="M8 3a5 5 0 0 0-5 5v3l-1 2h16l-1-2V8a5 5 0 0 0-5-5M8 3V2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M9 17a1.5 1.5 0 0 0 2.5 1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        <span class="badge">3</span>
-      </button>
-      <button class="topbar-btn" title="Help">
-        <svg viewBox="0 0 20 20" width="19" height="19">
-          <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M7.5 8a2.5 2.5 0 0 1 4.2-1.8c.8.7.8 2 .1 2.8l-.8.8V11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="10" cy="14" r="0.75" fill="currentColor"/>
-        </svg>
-      </button>
+      <div class="topbar-action" ref="messagesContainer">
+        <button class="topbar-btn" title="Notifications" @click.stop="toggleMessages">
+          <svg viewBox="0 0 20 20" width="19" height="19">
+            <path d="M8 3a5 5 0 0 0-5 5v3l-1 2h16l-1-2V8a5 5 0 0 0-5-5M8 3V2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M9 17a1.5 1.5 0 0 0 2.5 1" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span v-if="notificationsStore.unreadCount" class="badge">{{ notificationsStore.unreadCount }}</span>
+        </button>
+        <transition name="dropdown">
+          <div v-if="messagesVisible" class="topbar-panel messages-panel" @click.stop>
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">{{ isZh ? '\u6d88\u606f' : 'Messages' }}</div>
+                <div class="panel-subtitle">{{ isZh ? `${notificationsStore.unreadCount} \u6761\u672a\u8bfb` : `${notificationsStore.unreadCount} unread` }}</div>
+              </div>
+              <button class="panel-action" @click="markAllRead">{{ isZh ? '\u5168\u90e8\u5df2\u8bfb' : 'Mark all read' }}</button>
+            </div>
+            <div v-if="notificationsStore.notifications.length === 0" class="message-empty">
+              {{ isZh ? '\u6682\u65e0\u6d88\u606f' : 'No notifications yet' }}
+            </div>
+            <div v-else class="message-list">
+              <div v-for="msg in notificationsStore.notifications" :key="msg.id" class="message-item" :class="{ unread: !msg.read }">
+                <span class="message-dot" :class="msg.tone"></span>
+                <div class="message-content">
+                  <div class="message-title">{{ msg.title }}</div>
+                  <div class="message-text">{{ msg.text }}</div>
+                  <div class="message-time">{{ msg.time }}</div>
+                </div>
+                <div class="message-actions">
+                  <button v-if="!msg.read" class="message-mini-action" type="button" title="Mark as read" @click="markNotificationRead(msg.id)">
+                    <svg viewBox="0 0 20 20" width="14" height="14"><path d="M4 10l4 4 8-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <button class="message-mini-action danger" type="button" title="Delete" @click="deleteNotification(msg.id)">
+                    <svg viewBox="0 0 20 20" width="14" height="14"><path d="M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
+      <div class="topbar-action" ref="helpContainer">
+        <button class="topbar-btn" title="Help" @click.stop="toggleHelp">
+          <svg viewBox="0 0 20 20" width="19" height="19">
+            <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M7.5 8a2.5 2.5 0 0 1 4.2-1.8c.8.7.8 2 .1 2.8l-.8.8V11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="10" cy="14" r="0.75" fill="currentColor"/>
+          </svg>
+        </button>
+        <transition name="dropdown">
+          <div v-if="helpVisible" class="topbar-panel help-panel" @click.stop>
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">{{ isZh ? '\u5e2e\u52a9\u4e0e\u5feb\u6377\u952e' : 'Help & Shortcuts' }}</div>
+                <div class="panel-subtitle">{{ isZh ? '\u5feb\u901f\u5bfc\u822a\u548c\u5e38\u7528\u63d0\u793a' : 'Quick navigation and useful tips' }}</div>
+              </div>
+            </div>
+            <div class="help-list">
+              <button class="help-item" @click="openReport">
+                <span class="help-item-icon">📊</span>
+                <span class="help-item-text">
+                  <span>{{ isZh ? '\u62a5\u8868\u67e5\u8be2' : 'Report Query' }}</span>
+                  <small>{{ isZh ? '\u6253\u5f00\u5206\u6790\u548c\u4e1a\u52a1\u62a5\u8868' : 'Open analytics and business reports' }}</small>
+                </span>
+              </button>
+              <button class="help-item" @click="openSettings">
+                <span class="help-item-icon">⚙️</span>
+                <span class="help-item-text">
+                  <span>{{ isZh ? '\u7cfb\u7edf\u8bbe\u7f6e' : 'System Settings' }}</span>
+                  <small>{{ isZh ? '\u8bed\u8a00\u3001\u4e3b\u9898\u548c\u7cfb\u7edf\u504f\u597d\u8bbe\u7f6e' : 'Language, theme and system preferences' }}</small>
+                </span>
+              </button>
+              <div class="help-shortcuts">
+                <div><kbd>Ctrl</kbd> + <kbd>K</kbd><span>{{ isZh ? '\u5168\u5c40\u641c\u7d22' : 'Global search' }}</span></div>
+                <div><kbd>F4</kbd><span>{{ isZh ? '\u4e3b\u6570\u636e\u67e5\u8be2' : 'Master data lookup' }}</span></div>
+              </div>
+            </div>
+          </div>
+        </transition>
+      </div>
       <div ref="userMenuContainer" class="user-area" title="Account menu" @click.stop="toggleUserMenu">
         <div class="user-avatar">{{ authStore.initials || 'H' }}</div>
         <div class="user-info">
@@ -114,11 +180,46 @@
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { usePreferencesStore } from '@/stores/preferences'
+import { useNotificationsStore } from '@/stores/notifications'
 
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-const pageTitle = computed(() => (route.meta.title as string) || 'Dashboard')
+const preferences = usePreferencesStore()
+const isZh = computed(() => preferences.locale === 'zh')
+const notificationsStore = useNotificationsStore()
+const pageTitleKeys: Record<string, string> = {
+  Home: '首页',
+  BusinessPartner: '业务伙伴',
+  Material: '物料主数据',
+  Product: '产品',
+  Pricing: '定价条件',
+  SalesOrg: '销售组织',
+  InquiryManagement: '询价管理',
+  CreateInquiry: '创建询价',
+  InquiryDetail: '询价详情',
+  QuotationManagement: '报价管理',
+  CreateQuotation: '创建报价',
+  QuotationDetail: '报价详情',
+  SalesOrders: '销售订单',
+  CreateOrder: '创建销售订单',
+  OrderDetail: '销售订单详情',
+  DeliveryList: '发货单列表',
+  DeliveryMonitor: '配送状态监控',
+  DeliveryDetail: '发货单详情',
+  InvoiceManagement: '发票管理',
+  ReceivablesManagement: '应收管理',
+  UnpaidReceivables: '未收应收',
+  ReceivableDetail: '应收详情',
+  Report: '报表查询',
+  Settings: '系统设置',
+}
+
+const pageTitle = computed(() => {
+  const fallback = (route.meta.title as string) || 'Dashboard'
+  return preferences.locale === 'zh' ? (pageTitleKeys[String(route.name || '')] || fallback) : fallback
+})
 
 // --- Search Index ---
 interface SearchablePage {
@@ -258,6 +359,10 @@ const highlightIndex = ref(-1)
 const searchContainer = ref<HTMLElement | null>(null)
 const userMenuContainer = ref<HTMLElement | null>(null)
 const userMenuVisible = ref(false)
+const messagesContainer = ref<HTMLElement | null>(null)
+const helpContainer = ref<HTMLElement | null>(null)
+const messagesVisible = ref(false)
+const helpVisible = ref(false)
 
 const filteredPages = computed(() => {
   const q = searchQuery.value.toLowerCase().trim()
@@ -305,6 +410,48 @@ function closeUserMenu() {
   userMenuVisible.value = false
 }
 
+function toggleMessages() {
+  messagesVisible.value = !messagesVisible.value
+  helpVisible.value = false
+  closeSearch()
+  closeUserMenu()
+}
+
+function toggleHelp() {
+  helpVisible.value = !helpVisible.value
+  messagesVisible.value = false
+  closeSearch()
+  closeUserMenu()
+}
+
+function closeMessagePanels() {
+  messagesVisible.value = false
+  helpVisible.value = false
+}
+
+function markAllRead() {
+  notificationsStore.markAllRead()
+}
+
+function markNotificationRead(id: number) {
+  const target = notificationsStore.notifications.find((item) => item.id === id)
+  if (target) target.read = true
+}
+
+function deleteNotification(id: number) {
+  notificationsStore.notifications = notificationsStore.notifications.filter((item) => item.id !== id)
+}
+
+function openReport() {
+  closeMessagePanels()
+  router.push('/report')
+}
+
+function openSettings() {
+  closeMessagePanels()
+  router.push('/settings')
+}
+
 async function handleLogout() {
   closeUserMenu()
   await authStore.logout()
@@ -326,6 +473,12 @@ function handleClickOutside(e: MouseEvent) {
   if (userMenuContainer.value && !userMenuContainer.value.contains(target)) {
     closeUserMenu()
   }
+  if (messagesContainer.value && !messagesContainer.value.contains(target)) {
+    messagesVisible.value = false
+  }
+  if (helpContainer.value && !helpContainer.value.contains(target)) {
+    helpVisible.value = false
+  }
 }
 
 // Ctrl+K shortcut and Escape handling
@@ -333,6 +486,7 @@ function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') {
     closeSearch()
     closeUserMenu()
+    closeMessagePanels()
     return
   }
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -348,6 +502,7 @@ function handleKeydown(e: KeyboardEvent) {
 watch(() => route.fullPath, () => {
   closeSearch()
   closeUserMenu()
+  closeMessagePanels()
 })
 
 onMounted(() => {
@@ -375,6 +530,203 @@ onUnmounted(() => {
 .topbar-left { display: flex; align-items: center; }
 .page-title { font-size: 20px; font-weight: 700; color: #12372A; margin: 0; letter-spacing: -0.3px; }
 .topbar-right { display: flex; align-items: center; gap: 8px; }
+
+.topbar-right { position: relative; }
+.topbar-action { position: relative; display: flex; align-items: center; }
+.topbar-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 360px;
+  background: #fffdf4;
+  border: 1px solid rgba(173, 188, 159, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 16px 44px rgba(18, 55, 42, 0.18);
+  z-index: 12000;
+  overflow: hidden;
+}
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid rgba(173, 188, 159, 0.2);
+  background: linear-gradient(135deg, rgba(67, 104, 80, 0.05), rgba(173, 188, 159, 0.08));
+}
+.panel-title {
+  color: #12372A;
+  font-size: 14px;
+  font-weight: 750;
+  letter-spacing: -0.2px;
+}
+.panel-subtitle {
+  color: rgba(18, 55, 42, 0.45);
+  font-size: 11px;
+  margin-top: 3px;
+}
+.panel-action {
+  border: none;
+  background: rgba(67, 104, 80, 0.1);
+  color: #436850;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.panel-action:hover { background: #436850; color: #fff; }
+.message-list {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 8px 10px;
+}
+.message-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 10px;
+  border-radius: 11px;
+  transition: background-color 0.15s;
+}
+.message-item:hover { background: rgba(173, 188, 159, 0.12); }
+.message-item.unread { background: rgba(67, 104, 80, 0.07); }
+.message-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.message-dot.info { background: #4A90E2; }
+.message-dot.success { background: #4CAF50; }
+.message-dot.warning { background: #E2A03F; }
+.message-dot.danger { background: #D9534F; }
+.message-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.message-title {
+  color: #12372A;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.message-text {
+  color: rgba(18, 55, 42, 0.55);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.message-time {
+  color: rgba(18, 55, 42, 0.32);
+  font-size: 10px;
+  margin-top: 1px;
+}
+.message-empty {
+  padding: 28px 18px;
+  text-align: center;
+  color: rgba(18, 55, 42, 0.38);
+  font-size: 12px;
+}
+.message-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.message-item:hover .message-actions { opacity: 1; }
+.message-mini-action {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: rgba(67, 104, 80, 0.08);
+  color: #436850;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.message-mini-action:hover { background: #436850; color: #fff; }
+.message-mini-action.danger { color: #C0392B; background: rgba(217, 83, 79, 0.08); }
+.message-mini-action.danger:hover { background: #D9534F; color: #fff; }
+.help-list {
+  padding: 8px 10px 12px;
+}
+.help-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: none;
+  background: transparent;
+  padding: 11px 10px;
+  border-radius: 11px;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+.help-item:hover { background: rgba(173, 188, 159, 0.16); }
+.help-item-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(67, 104, 80, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.help-item-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #12372A;
+  font-size: 12px;
+  font-weight: 700;
+}
+.help-item-text small {
+  color: rgba(18, 55, 42, 0.45);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.help-shortcuts {
+  margin: 6px 0 0;
+  padding: 12px 10px 2px;
+  border-top: 1px dashed rgba(173, 188, 159, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.help-shortcuts div {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(18, 55, 42, 0.45);
+  font-size: 10px;
+}
+.help-shortcuts kbd {
+  background: rgba(173, 188, 159, 0.2);
+  border: 1px solid rgba(173, 188, 159, 0.35);
+  border-radius: 5px;
+  color: rgba(18, 55, 42, 0.6);
+  font-size: 10px;
+  font-family: 'SF Mono', Consolas, monospace;
+  padding: 2px 6px;
+}
+.help-shortcuts span { margin-left: auto; }
 
 .global-search {
   position: relative;

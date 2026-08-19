@@ -3,7 +3,7 @@
     <div class="header-card">
         <div class="hc-left">
           <div class="hc-icon"><svg viewBox="0 0 24 24" width="22" height="22"><rect x="2" y="5" width="20" height="13" rx="2" fill="none" stroke="#436850" stroke-width="1.8"/><path d="M6 5V3M18 5V3M2 11h20M7 16h3" fill="none" stroke="#436850" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <div class="hc-text"><h2 class="hc-title">Delivery Status Monitoring</h2><p class="hc-sub">Monitor delivery progress in real time. The status of each order is clear at a glance.</p></div>
+          <div class="hc-text"><h2 class="hc-title">{{ isZh ? '\u914d\u9001\u72b6\u6001\u76d1\u63a7' : 'Delivery Status Monitoring' }}</h2><p class="hc-sub">{{ isZh ? '\u5b9e\u65f6\u76d1\u63a7\u914d\u9001\u8fdb\u5ea6\uff0c\u6bcf\u7b14\u8ba2\u5355\u72b6\u6001\u4e00\u76ee\u4e86\u7136\u3002' : 'Monitor delivery progress in real time. The status of each order is clear at a glance.' }}</p></div>
         </div>
         <div class="hc-right">
           <label class="auto-refresh"><input type="checkbox" v-model="ar" /> Auto Refresh</label>
@@ -12,12 +12,12 @@
       </div>
 
       <div class="filter-bar">
-        <input type="text" class="form-input" v-model="f.dn" placeholder="Delivery No." />
-        <input type="text" class="form-input" v-model="f.sn" placeholder="Sales Order No." />
-        <input type="text" class="form-input" v-model="f.cn" placeholder="Customer Name" />
-        <select class="form-select" v-model="f.st"><option value="">All Statuses</option><option>Creating</option><option>Picking</option><option>Picked</option><option>In Transit</option><option>Completed</option><option>Cancelled</option></select>
-        <button class="btn btn-primary" @click="search" :disabled="loading">Search</button>
-        <button class="btn btn-outline" @click="reset" :disabled="loading">Reset</button>
+        <input type="text" class="form-input" v-model="f.dn" :placeholder="isZh ? '\u53d1\u8d27\u5355\u53f7' : 'Delivery No.'" />
+        <input type="text" class="form-input" v-model="f.sn" :placeholder="isZh ? '\u9500\u552e\u8ba2\u5355\u53f7' : 'Sales Order No.'" />
+        <input type="text" class="form-input" v-model="f.cn" :placeholder="isZh ? '\u5ba2\u6237\u540d\u79f0' : 'Customer Name'" />
+        <select class="form-select" v-model="f.st"><option value="">{{ isZh ? '\u5168\u90e8\u72b6\u6001' : 'All Statuses' }}</option><option>{{ isZh ? '\u521b\u5efa\u4e2d' : 'Creating' }}</option><option>{{ isZh ? '\u62e3\u914d\u4e2d' : 'Picking' }}</option><option>{{ isZh ? '\u5df2\u62e3\u914d' : 'Picked' }}</option><option>{{ isZh ? '\u8fd0\u8f93\u4e2d' : 'In Transit' }}</option><option>{{ isZh ? '\u5df2\u5b8c\u6210' : 'Completed' }}</option><option>{{ isZh ? '\u5df2\u53d6\u6d88' : 'Cancelled' }}</option></select>
+        <button class="btn btn-primary" @click="search" :disabled="loading">{{ isZh ? '\u67e5\u8be2' : 'Search' }}</button>
+        <button class="btn btn-outline" @click="reset" :disabled="loading">{{ isZh ? '\u91cd\u7f6e' : 'Reset' }}</button>
       </div>
 
       <div v-if="error" class="error-msg">{{ error }}</div>
@@ -25,11 +25,11 @@
       <div class="data-card">
         <div class="table-scroll"><table class="data-table">
           <thead><tr>
-            <th class="sticky-left">Del. No.</th><th>Sales Order</th><th>Customer</th><th>Planned GI</th><th>Status</th>
-            <th class="prog-hdr">Progress</th><th class="num qty-hdr">Qty (Pick/Total)</th><th>Action</th>
+            <th class="sticky-left">Del. No.</th><th>{{ isZh ? '\u9500\u552e\u8ba2\u5355' : 'Sales Order' }}</th><th>{{ isZh ? '\u5ba2\u6237' : 'Customer' }}</th><th>{{ isZh ? '\u8ba1\u5212\u53d1\u8d27\u8fc7\u8d26' : 'Planned GI' }}</th><th>{{ isZh ? '\u72b6\u6001' : 'Status' }}</th>
+            <th class="prog-hdr">{{ isZh ? '\u8fdb\u5ea6' : 'Progress' }}</th><th class="num qty-hdr">{{ isZh ? '\u6570\u91cf\uff08\u5df2\u62e3\u002f\u603b\u8ba1\uff09' : 'Qty (Pick/Total)' }}</th><th>{{ isZh ? '\u64cd\u4f5c' : 'Action' }}</th>
           </tr></thead>
           <tbody>
-            <tr v-if="loading && displayedRows.length === 0"><td colspan="9" class="empty-cell">Loading deliveries...</td></tr>
+            <tr v-if="loading && displayedRows.length === 0"><td colspan="9" class="empty-cell">{{ isZh ? '\u6b63\u5728\u52a0\u8f7d\u53d1\u8d27\u5355\u002e\u002e\u002e' : 'Loading deliveries...' }}</td></tr>
             <tr v-for="row in displayedRows" :key="row.id" class="data-row">
               <td class="sticky-left mono">{{ row.dn }}</td><td class="mono">{{ row.sn }}</td><td>{{ row.cn }}</td><td>{{ row.gi }}</td>
               <td><span class="stag" :class="sc(row.st)">{{ row.st }}</span></td>
@@ -43,14 +43,14 @@
               <td class="num mono qty-cell">{{ row.dt }}</td>
               <td>
                 <div class="row-actions">
-                  <a class="link" @click="$router.push('/delivery/detail/'+row.id)">View Details</a>
+                  <a class="link" @click="$router.push('/delivery/detail/'+row.id)">{{ isZh ? '\u67e5\u770b\u8be6\u60c5' : 'View Details' }}</a>
                   <a v-if="row.actionLabel" class="link pgi-link" :class="{disabled: postingId === row.id}" @click="processDelivery(row)">
                     {{ postingId === row.id ? 'Processing...' : row.actionLabel }}
                   </a>
                 </div>
               </td>
             </tr>
-            <tr v-if="!loading && displayedRows.length === 0"><td colspan="9" class="empty-cell">No deliveries found.</td></tr>
+            <tr v-if="!loading && displayedRows.length === 0"><td colspan="9" class="empty-cell">{{ isZh ? '\u672a\u627e\u5230\u53d1\u8d27\u5355\u3002' : 'No deliveries found.' }}</td></tr>
           </tbody>
         </table></div>
         <div class="table-footer">
@@ -65,6 +65,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { usePreferencesStore } from '@/stores/preferences'
 import { alert, confirm } from '@/utils/toast'
 import { confirmPicking, fetchDeliveries, postGoodsIssue, shipDelivery, startPicking } from '@/api/modules/logistics'
 import type { DeliveryListItem } from '@/api/modules/logistics'
@@ -72,6 +73,8 @@ import { fetchPartners } from '@/api/modules/master'
 import type { Partner } from '@/api/modules/master'
 
 const router = useRouter()
+const preferences = usePreferencesStore()
+const isZh = computed(() => preferences.locale === 'zh')
 const ar = ref(false)
 const ri = ref('30s')
 const f = reactive({ dn: '', sn: '', cn: '', st: '' })
@@ -85,16 +88,27 @@ const pagination = ref({ page: 1, pageSize: 20, total: 0, totalPages: 1 })
 const currentPage = ref(1)
 
 let refreshTimer: ReturnType<typeof setInterval> | null = null
-const milestones = ['Created', 'Picking', 'Picked', 'PGI']
+const milestones = computed(() => isZh.value ? ['\u521b\u5efa', '\u62e3\u914d', '\u5df2\u62e3', '\u53d1\u8d27\u8fc7\u8d26'] : ['Created', 'Picking', 'Picked', 'PGI'])
 
 // Status mapping
-const STATUS_LABEL: Record<string, string> = {
+const STATUS_LABEL_ZH: Record<string, string> = {
+  OPEN: '\u521b\u5efa\u4e2d',
+  PICKING: '\u62e3\u914d\u4e2d',
+  SHIPPED: '\u5df2\u62e3\u914d',
+  IN_TRANSIT: '\u8fd0\u8f93\u4e2d',
+  PGI_DONE: '\u5df2\u5b8c\u6210',
+  CANCELLED: '\u5df2\u53d6\u6d88',
+}
+const STATUS_LABEL_EN: Record<string, string> = {
   OPEN: 'Creating',
   PICKING: 'Picking',
   SHIPPED: 'Picked',
   IN_TRANSIT: 'In Transit',
   PGI_DONE: 'Completed',
   CANCELLED: 'Cancelled',
+}
+function statusLabel(status: string) {
+  return (isZh.value ? STATUS_LABEL_ZH : STATUS_LABEL_EN)[status] || status
 }
 
 const STATUS_INDEX: Record<string, number> = {
@@ -107,14 +121,11 @@ const STATUS_INDEX: Record<string, number> = {
 }
 
 function mapRow(item: DeliveryListItem) {
-  const st = STATUS_LABEL[item.deliveryStatus] || item.deliveryStatus
+  const st = statusLabel(item.deliveryStatus)
   const si = STATUS_INDEX[item.deliveryStatus] ?? 0
-  const actionMap: Record<string, string> = {
-    OPEN: 'Start Picking',
-    PICKING: 'Pick Items',
-    SHIPPED: 'Ship',
-    IN_TRANSIT: 'Post GI',
-  }
+  const actionMap = isZh.value
+    ? { OPEN: '\u5f00\u59cb\u62e3\u914d', PICKING: '\u62e3\u914d', SHIPPED: '\u53d1\u8d27', IN_TRANSIT: '\u53d1\u8d27\u8fc7\u8d26' } as Record<string, string>
+    : { OPEN: 'Start Picking', PICKING: 'Pick Items', SHIPPED: 'Ship', IN_TRANSIT: 'Post GI' } as Record<string, string>
   const total = item.totalQuantity ?? 0
   const delivered = item.deliveredQuantity ?? 0
 

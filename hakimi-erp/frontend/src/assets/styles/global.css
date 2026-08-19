@@ -1,4 +1,42 @@
 /* Global Styles for HAKIMI ERP */
+:root {
+  --app-bg: linear-gradient(135deg, #FBFADA 0%, #f5f3d8 100%);
+  --app-text: #12372A;
+  --app-muted: rgba(18, 55, 42, 0.45);
+  --app-border: rgba(173, 188, 159, 0.3);
+  --app-card: linear-gradient(145deg, #fdfce8, #f7f5d1);
+  --app-panel: #ffffff;
+  --app-input-bg: rgba(251, 250, 218, 0.4);
+  --app-primary: #436850;
+  --app-primary-dark: #365440;
+  --app-accent: #FBFADA;
+  --app-danger: #D9534F;
+  --app-warning: #F0AD4E;
+  --app-success: #5CB85C;
+  --app-info: #5BC0DE;
+}
+
+:root[data-theme='dark'] {
+  --app-bg: linear-gradient(135deg, #0f1f17 0%, #13271d 100%);
+  --app-text: #e8f3e5;
+  --app-muted: rgba(232, 243, 229, 0.52);
+  --app-border: rgba(173, 188, 159, 0.22);
+  --app-card: linear-gradient(145deg, #16291f, #101f18);
+  --app-panel: #15251d;
+  --app-input-bg: rgba(232, 243, 229, 0.06);
+  --app-primary: #7fb08f;
+  --app-primary-dark: #5a8a68;
+  --app-accent: #f0f3e2;
+  --app-danger: #ef8f87;
+  --app-warning: #f5c96b;
+  --app-success: #88cf94;
+  --app-info: #8ed3e8;
+}
+
+html.dark .el-button--primary,
+html.dark .el-message-box {
+  --el-color-primary: #7fb08f;
+}
 
 /* Layout */
 .page {
@@ -182,3 +220,83 @@
 .tab-bar { display: flex; gap: 0; border-bottom: 1px solid rgba(173,188,159,0.3); margin: 0 -24px 20px; padding: 0 24px; background: rgba(251, 250, 218, 0.3); border-radius: 14px 14px 0 0; }
 .tab-btn { padding: 12px 18px; font-size: 12px; font-weight: 500; color: rgba(18, 55, 42, 0.5); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; font-family: inherit; white-space: nowrap; }
 .tab-btn.active { color: #436850; font-weight: 600; border-bottom-color: #436850; background: linear-gradient(to bottom, transparent, rgba(67, 104, 80, 0.04)); }
+
+/* Dark theme compatibility overrides */
+html.dark .page-content,
+html.dark .main-content {
+  background: #0f1f17;
+}
+html.dark .header-card,
+html.dark .settings-card,
+html.dark .report-card,
+html.dark .result-header,
+html.dark .action-bar {
+  background: var(--app-card);
+  border-color: var(--app-border);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+html.dark .hc-title,
+html.dark .hc-sub,
+html.dark .rc-title,
+html.dark .rc-desc,
+html.dark .rh-main h3,
+html.dark .stmt-title,
+html.dark .stmt-period,
+html.dark .fc-val,
+html.dark .kpi-card .value,
+html.dark .panel-title,
+html.dark .sb-label,
+html.dark .sb-amount,
+html.dark .report-table td,
+html.dark .stmt-table td {
+  color: var(--app-text);
+}
+html.dark .rc-date,
+html.dark .rc-tag,
+html.dark .kpi-card label,
+html.dark .fc-header .label,
+html.dark .report-table th,
+html.dark .stmt-table th,
+html.dark .sb-meta,
+html.dark .stmt-footer p,
+html.dark .empty-result {
+  color: var(--app-muted);
+}
+html.dark .panel,
+html.dark .fin-card,
+html.dark .kpi-card,
+html.dark .kpi-row-4 .kpi-card,
+html.dark .kpi-row-2 .kpi-card,
+html.dark .stmt-table,
+html.dark .mode-btn.active {
+  background: var(--app-panel);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+html.dark .report-table,
+html.dark .stmt-table {
+  background: var(--app-panel);
+}
+html.dark .report-table th,
+html.dark .stmt-table th {
+  border-bottom-color: var(--app-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+html.dark .report-table td,
+html.dark .stmt-table td {
+  border-bottom-color: var(--app-border);
+}
+html.dark .form-input,
+html.dark .form-select,
+html.dark .fi,
+html.dark .fs {
+  background: var(--app-input-bg);
+  border-color: var(--app-border);
+  color: var(--app-text);
+}
+html.dark .form-input:focus,
+html.dark .form-select:focus,
+html.dark .fi:focus,
+html.dark .fs:focus {
+  background: #1a2d22;
+}

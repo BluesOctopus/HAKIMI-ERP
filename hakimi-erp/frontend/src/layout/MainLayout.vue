@@ -35,6 +35,6 @@ import ChatWidget from '@/components/ChatWidget.vue'
 .page-content {
   flex: 1;
   overflow-y: auto;
-  background-color: #FBFADA;
+  background-color: var(--app-bg);
 }
 </style>

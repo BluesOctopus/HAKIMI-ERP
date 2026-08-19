@@ -390,7 +390,7 @@ async function handleSave() {
     )
     const payload = {
       ...cleanForm,
-      salesOrderId: form.salesOrderId || `SO${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`,
+      salesOrderId: form.salesOrderId || `SO${new Date().toISOString().replace(/\D/g, '').slice(2, 14)}`,
       quotationId: quotationId.value || form.quotationId || null,
       items: [
         {

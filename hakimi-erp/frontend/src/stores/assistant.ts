@@ -37,17 +37,27 @@ export const useAssistantStore = defineStore('assistant', () => {
   const isOpen = ref(false)
   const loading = ref(false)
   const messages = ref<ChatMessage[]>([{ ...WELCOME }])
+  const pendingPrompt = ref('')
 
-  function open() {
+  function open(prompt?: string) {
+    pendingPrompt.value = prompt?.trim() || ''
     isOpen.value = true
   }
 
   function close() {
     isOpen.value = false
+    pendingPrompt.value = ''
   }
 
   function toggle() {
     isOpen.value = !isOpen.value
+    if (!isOpen.value) pendingPrompt.value = ''
+  }
+
+  function consumePendingPrompt(): string {
+    const prompt = pendingPrompt.value
+    pendingPrompt.value = ''
+    return prompt
   }
 
   function reset() {
@@ -141,5 +151,5 @@ export const useAssistantStore = defineStore('assistant', () => {
     })
   }
 
-  return { isOpen, loading, messages, open, close, toggle, reset, ask, confirmPending, cancelPending }
+  return { isOpen, loading, messages, pendingPrompt, open, close, toggle, reset, ask, confirmPending, cancelPending, consumePendingPrompt }
 })

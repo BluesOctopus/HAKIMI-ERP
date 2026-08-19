@@ -2,36 +2,36 @@
   <div class="page-container">
     <!-- Header -->
     <div class="page-header">
-        <h2 class="page-title">{{ isEdit ? 'Edit' : 'Create' }} Quotation</h2>
+        <h2 class="page-title">{{ isZh ? (isEdit ? '\u7f16\u8f91\u62a5\u4ef7' : '\u521b\u5efa\u62a5\u4ef7') : ((isEdit ? 'Edit' : 'Create') + ' Quotation') }}</h2>
         <button class="exit-btn" @click="handleExit">
           <svg viewBox="0 0 20 20" width="16" height="16">
             <path d="M6 6l8 8M14 6l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
           </svg>
-          Exit
+          {{ isZh ? '退出' : 'Exit' }}
         </button>
       </div>
 
       <!-- Main Form Area -->
       <div class="form-card">
         <div class="hdr-info-row" v-if="inquiryId">
-          <span class="info-tag">Ref Inquiry: {{ inquiryId }}</span>
+          <span class="info-tag">{{ isZh ? '\u53c2\u8003\u8be2\u4ef7\uff1a' : 'Ref Inquiry: ' }}{{ inquiryId }}</span>
         </div>
         <div class="form-row form-row-3">
           <div class="form-group">
-            <label class="form-label">Quotation No.</label>
-            <input type="text" class="form-input" v-model="form.quotationId" placeholder="Auto-generated if empty" :disabled="isEdit" />
+            <label class="form-label">{{ isZh ? '报价单号' : 'Quotation No.' }}</label>
+            <input type="text" class="form-input" v-model="form.quotationId" :placeholder="isZh ? '留空自动生成' : 'Auto-generated if empty'" :disabled="isEdit" />
           </div>
           <div class="form-group">
-            <label class="form-label required">Quotation Type</label>
+            <label class="form-label required">{{ isZh ? '报价类型' : 'Quotation Type' }}</label>
             <select class="form-select" v-model="form.quotationType">
-              <option value="QT">Quotation (QT)</option>
+              <option value="QT">{{ isZh ? '报价 (QT)' : 'Quotation (QT)' }}</option>
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label required">Customer (BP)</label>
+            <label class="form-label required">{{ isZh ? '客户（BP）' : 'Customer (BP)' }}</label>
             <div class="input-with-f4">
               <select class="form-select" v-model="form.customerId" :disabled="isFromInquiry">
-                <option value="">-- Select Customer --</option>
+                <option value="">{{ isZh ? '-- 选择客户 --' : '-- Select Customer --' }}</option>
                 <option v-for="p in partners" :key="p.bpId" :value="p.bpId">{{ p.bpId }} - {{ p.bpName }}</option>
               </select>
               <button class="f4-trigger" @click="openF4('customer')" :disabled="isFromInquiry"><svg viewBox="0 0 20 20" width="14" height="14"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M13 13l4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
@@ -54,27 +54,27 @@
         <div class="tab-content" v-show="activeTab === 'sales'">
           <div class="form-grid-3">
             <div class="form-group">
-              <label class="form-label">Sales Org</label>
+              <label class="form-label">{{ isZh ? '销售组织' : 'Sales Org' }}</label>
               <input type="text" class="form-input" v-model="form.salesOrg" />
             </div>
             <div class="form-group">
-              <label class="form-label">Dist. Channel</label>
+              <label class="form-label">{{ isZh ? '分销渠道' : 'Dist. Channel' }}</label>
               <input type="text" class="form-input" v-model="form.distributionChannel" />
             </div>
             <div class="form-group">
-              <label class="form-label">Division</label>
+              <label class="form-label">{{ isZh ? '产品组' : 'Division' }}</label>
               <input type="text" class="form-input" v-model="form.division" />
             </div>
             <div class="form-group">
-              <label class="form-label">Valid From</label>
+              <label class="form-label">{{ isZh ? '有效期自' : 'Valid From' }}</label>
               <input type="date" class="form-input" v-model="form.validFrom" />
             </div>
             <div class="form-group">
-              <label class="form-label">Valid To</label>
+              <label class="form-label">{{ isZh ? '有效期至' : 'Valid To' }}</label>
               <input type="date" class="form-input" v-model="form.validTo" />
             </div>
             <div class="form-group">
-              <label class="form-label">Currency</label>
+              <label class="form-label">{{ isZh ? '币种' : 'Currency' }}</label>
               <input type="text" class="form-input" v-model="form.currency" />
             </div>
           </div>
@@ -84,28 +84,28 @@
         <div class="tab-content" v-show="activeTab === 'item'">
           <div class="form-grid-2">
             <div class="form-group">
-              <label class="form-label required">Material</label>
+              <label class="form-label required">{{ isZh ? '物料' : 'Material' }}</label>
               <div class="input-with-f4">
                 <select class="form-select" v-model="itemForm.materialId">
-                  <option value="">-- Select Material --</option>
+                  <option value="">{{ isZh ? '-- 选择物料 --' : '-- Select Material --' }}</option>
                   <option v-for="m in materials" :key="m.materialId" :value="m.materialId">{{ m.materialId }} - {{ m.materialName }}</option>
                 </select>
                 <button class="f4-trigger" @click="openF4('material')"><svg viewBox="0 0 20 20" width="14" height="14"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M13 13l4 4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Item Description</label>
+              <label class="form-label">{{ isZh ? '行项目描述' : 'Item Description' }}</label>
               <input type="text" class="form-input" v-model="itemForm.itemDescription" />
             </div>
             <div class="form-group">
-              <label class="form-label required">Quantity</label>
+              <label class="form-label required">{{ isZh ? '数量' : 'Quantity' }}</label>
               <div class="input-with-unit">
                 <input type="number" class="form-input" v-model="itemForm.orderQuantity" />
                 <span class="input-unit">PC</span>
               </div>
             </div>
             <div class="form-group">
-              <label class="form-label">Net Price</label>
+              <label class="form-label">{{ isZh ? '净价' : 'Net Price' }}</label>
               <div class="input-with-unit">
                 <input type="number" class="form-input" v-model="itemForm.netPrice" />
                 <span class="input-unit">CNY</span>
@@ -114,8 +114,8 @@
           </div>
           
           <div class="price-analysis">
-            <button class="btn btn-outline btn-sm" @click="checkAvailability">Check Availability</button>
-            <button class="btn btn-outline btn-sm" @click="showAnalysis">Pricing Analysis</button>
+            <button class="btn btn-outline btn-sm" @click="checkAvailability">{{ isZh ? '检查可用性' : 'Check Availability' }}</button>
+            <button class="btn btn-outline btn-sm" @click="showAnalysis">{{ isZh ? '定价分析' : 'Pricing Analysis' }}</button>
           </div>
         </div>
 
@@ -123,22 +123,22 @@
         <div class="tab-content" v-show="activeTab === 'billing'">
           <div class="form-grid-3">
             <div class="form-group">
-              <label class="form-label">Payment Terms</label>
+              <label class="form-label">{{ isZh ? '付款条件' : 'Payment Terms' }}</label>
               <input type="text" class="form-input" v-model="form.paymentTerms" />
             </div>
             <div class="form-group">
-              <label class="form-label">Incoterms</label>
+              <label class="form-label">{{ isZh ? '贸易条款' : 'Incoterms' }}</label>
               <input type="text" class="form-input" v-model="form.incoterms" />
             </div>
             <div class="form-group">
-              <label class="form-label">Delivering Plant</label>
+              <label class="form-label">{{ isZh ? '交货工厂' : 'Delivering Plant' }}</label>
               <input type="text" class="form-input" v-model="form.deliveringPlant" />
             </div>
           </div>
         </div>
 
         <div class="tab-content tab-placeholder" v-show="!['sales','item','billing'].includes(activeTab)">
-          <p>{{ activeTabLabel }} &mdash; content to be developed</p>
+          <p>{{ activeTabLabel }} &mdash; {{ isZh ? '功能待开发' : 'content to be developed' }}</p>
         </div>
       </div>
 
@@ -150,30 +150,30 @@
               <path d="M4 16V4a1 1 0 0 1 1-1h8l4 4v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.5"/>
               <path d="M13 3v4h4M7 12h6M7 15h4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            {{ saving ? 'Saving...' : 'Save' }}
+            {{ isZh ? (saving ? '\u4fdd\u5b58\u4e2d...' : '\u4fdd\u5b58') : (saving ? 'Saving...' : 'Save') }}
           </button>
           <button class="btn btn-secondary" @click="handleSaveContinue" :disabled="saving" v-if="!isEdit">
-            Save &amp; Continue
+            {{ isZh ? '\u4fdd\u5b58\u5e76\u7ee7\u7eed' : 'Save & Continue' }}
           </button>
           <button class="btn btn-outline" @click="convertToOrder" v-if="isEdit && form.status === 'OPEN'">
-            Convert to Order
+            {{ isZh ? '转为销售订单' : 'Convert to Order' }}
           </button>
         </div>
-        <button class="btn btn-border" @click="handleExit" :disabled="saving">Cancel</button>
+        <button class="btn btn-border" @click="handleExit" :disabled="saving">{{ isZh ? '取消' : 'Cancel' }}</button>
       </div>
 
       <!-- Recent Quotations -->
       <div class="form-card" style="margin-top: 30px;">
-        <h3 class="block-title">Recent Quotations</h3>
+        <h3 class="block-title">{{ isZh ? '最近报价' : 'Recent Quotations' }}</h3>
         <table class="data-table">
           <thead>
             <tr>
               <th>ID</th>
-              <th>Customer</th>
-              <th>Valid Until</th>
-              <th>Net Value</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th>{{ isZh ? '客户' : 'Customer' }}</th>
+              <th>{{ isZh ? '有效期至' : 'Valid Until' }}</th>
+              <th>{{ isZh ? '净值' : 'Net Value' }}</th>
+              <th>{{ isZh ? '状态' : 'Status' }}</th>
+              <th>{{ isZh ? '操作' : 'Action' }}</th>
             </tr>
           </thead>
           <tbody>
@@ -183,7 +183,7 @@
               <td>{{ q.validTo || 'N/A' }}</td>
               <td class="num">¥{{ q.netValue?.toLocaleString() }}</td>
               <td><span class="status-tag">{{ q.status }}</span></td>
-              <td><a class="link-btn" @click="loadQuotation(q.quotationId)">Edit</a></td>
+              <td><a class="link-btn" @click="loadQuotation(q.quotationId)">{{ isZh ? '编辑' : 'Edit' }}</a></td>
             </tr>
           </tbody>
         </table>
@@ -196,6 +196,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { usePreferencesStore } from '@/stores/preferences'
 import F4SearchModal from '@/components/F4SearchModal.vue'
 import SuccessModal from '@/components/SuccessModal.vue'
 import { alert } from '@/utils/toast'
@@ -211,6 +212,8 @@ import {
 
 const router = useRouter()
 const route = useRoute()
+const preferences = usePreferencesStore()
+const isZh = computed(() => preferences.locale === 'zh')
 
 const loading = ref(false)
 const saving = ref(false)
@@ -229,15 +232,23 @@ const partners = ref<any[]>([])
 const materials = ref<any[]>([])
 const recentQuotations = ref<any[]>([])
 
-const tabs = [
-  { key: 'sales', label: 'Sales Data' },
-  { key: 'item', label: 'Item Overview' },
-  { key: 'billing', label: 'Billing' },
-  { key: 'conditions', label: 'Conditions' },
-  { key: 'partners', label: 'Partners' },
-]
+const tabs = computed(() => isZh.value
+  ? [
+    { key: 'sales', label: '销售数据' },
+    { key: 'item', label: '行项目概览' },
+    { key: 'billing', label: '开票' },
+    { key: 'conditions', label: '条件' },
+    { key: 'partners', label: '合作伙伴' },
+  ]
+  : [
+    { key: 'sales', label: 'Sales Data' },
+    { key: 'item', label: 'Item Overview' },
+    { key: 'billing', label: 'Billing' },
+    { key: 'conditions', label: 'Conditions' },
+    { key: 'partners', label: 'Partners' },
+  ])
 
-const activeTabLabel = computed(() => tabs.find(t => t.key === activeTab.value)?.label || '')
+const activeTabLabel = computed(() => tabs.value.find(t => t.key === activeTab.value)?.label || '')
 
 const form = reactive({
   quotationId: '',
@@ -287,7 +298,7 @@ async function loadQuotation(id: string) {
       Object.assign(itemForm, data.items[0])
     }
   } catch (err: any) {
-    alert('Failed to load quotation: ' + err.message)
+    alert(isZh.value ? '加载报价失败：' + err.message : 'Failed to load quotation: ' + err.message)
   } finally {
     loading.value = false
   }
@@ -315,7 +326,7 @@ async function loadFromInquiry(id: string) {
       itemForm.netPrice = item.netPrice || item.unitPrice || 0
     }
   } catch (err: any) {
-    alert('Failed to load inquiry reference: ' + err.message)
+    alert(isZh.value ? '加载询价参考失败：' + err.message : 'Failed to load inquiry reference: ' + err.message)
   } finally {
     loading.value = false
   }
@@ -332,7 +343,7 @@ onMounted(async () => {
 
 async function handleSave() {
   if (!form.customerId || !itemForm.materialId) {
-    alert('Please fill in required fields: Customer and Material')
+    alert(isZh.value ? '请填写必填项：客户和物料' : 'Please fill in required fields: Customer and Material')
     return
   }
   saving.value = true
@@ -357,14 +368,14 @@ async function handleSave() {
     
     if (isEdit.value) {
       await updateQuotation(form.quotationId, payload)
-      successMsg.value = `Quotation ${form.quotationId} updated successfully!`
+      successMsg.value = isZh.value ? `报价单 ${form.quotationId} 更新成功！` : `Quotation ${form.quotationId} updated successfully!`
     } else {
       await createQuotation(payload)
-      successMsg.value = `Quotation ${payload.quotationId} created successfully!`
+      successMsg.value = isZh.value ? `报价单 ${payload.quotationId} 创建成功！` : `Quotation ${payload.quotationId} created successfully!`
     }
     successVisible.value = true
   } catch (err: any) {
-    alert('Save failed: ' + err.message)
+    alert(isZh.value ? '保存失败：' + err.message : 'Save failed: ' + err.message)
   } finally {
     saving.value = false
   }
@@ -405,11 +416,11 @@ function onF4Select(item: any) {
 }
 
 function checkAvailability() {
-  alert(`ATP Check: Material ${itemForm.materialId} is AVAILABLE.`)
+  alert(isZh.value ? `可用性检查：物料 ${itemForm.materialId} 可用。` : `ATP Check: Material ${itemForm.materialId} is AVAILABLE.`)
 }
 
 function showAnalysis() {
-  alert("Pricing Analysis: PR00 Base Price, K007 Discount, MWST Tax.")
+  alert(isZh.value ? '定价分析：PR00 基础价，K007 折扣，MWST 税。' : "Pricing Analysis: PR00 Base Price, K007 Discount, MWST Tax.")
 }
 </script>
 

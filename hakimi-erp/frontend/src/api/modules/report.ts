@@ -18,6 +18,26 @@ export function fetchDeliveryStats() {
   return get<any>(`${BASE}/delivery-stats`)
 }
 
+export function fetchCustomerAnalysis() {
+  return get<any>(`${BASE}/customer-analysis`)
+}
+
+export function fetchInventoryTurnover() {
+  return get<any>(`${BASE}/inventory-turnover`)
+}
+
+export function fetchPricingConditionsReport() {
+  return get<any>(`${BASE}/pricing-conditions`)
+}
+
+export function fetchTaxComplianceReport() {
+  return get<any>(`${BASE}/tax-compliance`)
+}
+
+export function fetchQuotationConversionReport() {
+  return get<any>(`${BASE}/quotation-conversion`)
+}
+
 export function fetchDashboardSummary() {
   return get<any>(`${BASE}/dashboard-summary`)
 }

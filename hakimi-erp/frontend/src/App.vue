@@ -22,10 +22,11 @@ html, body {
 body {
   font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
   font-size: 13px;
-  color: #12372A;
-  background: linear-gradient(135deg, #FBFADA 0%, #f5f3d8 100%);
+  color: var(--app-text);
+  background: var(--app-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 #app {

@@ -1,0 +1,1 @@
+﻿const x = { "Home": "首页", "Customer": "客户" }

@@ -29,6 +29,7 @@ from decimal import Decimal
 from typing import Any, Optional
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.models.finance import Invoice, OpenAccountReceivable
 from app.models.logistics import Delivery
@@ -39,27 +40,39 @@ from app.services.logistics_service import logistics_service
 
 # When False, messages that do not match a demo intent get the canned
 # guidance reply instead of being forwarded to the LLM assistant.
-FALLBACK_TO_LLM = False
+FALLBACK_TO_LLM = True
 
 # ---------------------------------------------------------------------------
 # Intent matching
 # ---------------------------------------------------------------------------
 
 _SO_RE = re.compile(r"\bSO[-\s]?(\d{1,10})\b", re.IGNORECASE)
+_BARE_ORDER_RE = re.compile(r"(?<![A-Za-z0-9])(\d{5,10})(?![A-Za-z0-9])")
+_ORDER_HINT_RE = re.compile(r"(?:\u8ba2\u5355|\u5355\u53f7|order|sales\s*order|so)\s*[:#\u53f7-]?\s*(\d{1,10})", re.IGNORECASE)
 _QTY_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:件|个|台|套|箱|pcs?|PC)", re.IGNORECASE)
 
 _PICK_WORDS = ("拣", "pick")
 _SETTLE_WORDS = ("平帐", "平账", "清账", "清帐", "核销", "收款", "settle", "settlement")
 _FULL_FLOW_HINTS = ("全流程", "全程", "一路", "一条龙", "一把梭", "端到端", "from pick", "order-to-cash", "order to cash")
+_STATUS_WORDS = ("状态", "进度", "查询", "查看", "详情", "在哪", "status", "progress", "track", "check")
 
 INTENTS = ("full", "start", "pick", "confirm", "ship", "pgi", "invoice", "settle")
 
 
 def _extract_so_id(message: str) -> Optional[str]:
     m = _SO_RE.search(message)
-    if not m:
-        return None
-    return "SO" + m.group(1).zfill(5)
+    if m:
+        return "SO" + m.group(1).zfill(5)
+
+    m = _ORDER_HINT_RE.search(message)
+    if m:
+        return "SO" + m.group(1).zfill(5)
+
+    m = _BARE_ORDER_RE.search(message)
+    if m:
+        return "SO" + m.group(1).zfill(5)
+
+    return None
 
 
 def _extract_qty(message: str) -> Optional[Decimal]:
@@ -103,6 +116,9 @@ def match_intent(message: str) -> Optional[dict[str, Any]]:
         intent = "settle"
 
     if intent is None:
+        so_id = _extract_so_id(text)
+        if so_id:
+            return {"intent": "status", "so_id": so_id, "qty": None}
         return None
     return {
         "intent": intent,
@@ -172,6 +188,7 @@ def _latest_delivery(db: Session, so_id: str) -> Optional[Delivery]:
     return (
         db.query(Delivery)
         .filter(Delivery.sales_order_id == so_id)
+        .filter(Delivery.delivery_status != "CANCELLED")
         .order_by(Delivery.delivery_id.desc())
         .first()
     )
@@ -567,6 +584,59 @@ def _plan_lines(db: Session, so: SalesOrder, delivery: Optional[Delivery],
     return ["对发票全额收款核销（该订单尚无发票，执行时将如实提示）"]
 
 
+def _status_reply(db: Session, so_id: Optional[str]) -> dict[str, Any]:
+    """Read-only single-order status lookup, matched by exact SO id."""
+    try:
+        so = _find_so(db, so_id)
+    except StageBlocked as exc:
+        return _error_reply(str(exc))
+
+    total_qty, est = _so_totals(so)
+    deliveries = (
+        db.query(Delivery)
+        .filter(Delivery.sales_order_id == so.sales_order_id)
+        .filter(Delivery.delivery_status != "CANCELLED")
+        .order_by(Delivery.delivery_id.asc())
+        .all()
+    )
+    invoice = (
+        db.query(Invoice)
+        .filter(Invoice.sales_order_id == so.sales_order_id)
+        .order_by(Invoice.invoice_id.desc())
+        .first()
+    )
+    ar = None
+    if invoice is not None:
+        ar = db.query(OpenAccountReceivable).filter(OpenAccountReceivable.invoice_id == invoice.invoice_id).first()
+
+    steps: list[dict[str, str]] = []
+    _step(steps, "📄", f"销售订单 {so.sales_order_id}：客户 {so.customer_id}，状态 {so.status}")
+    _step(steps, "🔢", f"行项目 {len(so.items)} 项，合计 {_qty_fmt(total_qty)} 件，净值 {_money(so.net_value)}，含税预估 {_money(est)}")
+    if not deliveries:
+        _step(steps, "🚚", "尚未创建有效发货单")
+    else:
+        for delivery in deliveries:
+            picked = sum(Decimal(str(i.picked_quantity or 0)) for i in delivery.items)
+            needed = sum(Decimal(str(i.delivery_quantity or 0)) for i in delivery.items)
+            tracking = f"，运单号 {delivery.tracking_no}" if delivery.tracking_no else ""
+            _step(steps, "🚚", f"发货单 {delivery.delivery_id}：状态 {delivery.delivery_status}，已拣 {_qty_fmt(picked)}/{_qty_fmt(needed)} 件{tracking}")
+    if invoice is not None:
+        if ar is not None:
+            remaining = Decimal(str(ar.receivable_amount)) - Decimal(str(ar.received_amount or 0))
+            _step(steps, "🧾", f"发票 {invoice.invoice_id}：金额 {_money(invoice.total_amount)}，未收余额 {_money(remaining)}")
+        else:
+            _step(steps, "🧾", f"发票 {invoice.invoice_id}：金额 {_money(invoice.total_amount)}")
+    else:
+        _step(steps, "🧾", "尚未开票")
+
+    return {
+        "reply": f"已按单号精确识别到销售订单 {so.sales_order_id}，当前进度如下：",
+        "steps": steps,
+        "navigation": {"label": "销售订单", "route": "/sales/orders"},
+        "suggestions": [f"把 {so.sales_order_id} 从拣配一路跑到平帐"],
+    }
+
+
 def _error_reply(text: str) -> dict[str, Any]:
     return {
         "reply": text,
@@ -680,6 +750,8 @@ def handle(db: Session, message: str, pending_action: Any = None) -> Optional[di
     matched = match_intent(message)
     if matched is None:
         return None
+    if matched["intent"] == "status":
+        return _status_reply(db, matched["so_id"])
 
     return _plan(db, matched["intent"], matched["so_id"], matched.get("qty"))
 
